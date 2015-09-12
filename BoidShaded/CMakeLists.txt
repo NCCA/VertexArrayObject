@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8.11)
 # Name of the project
-set(PROJECT_NAME Boid)
+set(PROJECT_NAME BoidShaded)
 project(${PROJECT_NAME})
 
 #Bring the headers into the project (local ones)
