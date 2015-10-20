@@ -191,8 +191,8 @@ void NGLScene::initializeGL()
 
 	shader->createShaderProgram("TextureShader");
 
-	shader->attachShader("SimpleVertex",ngl::VERTEX);
-	shader->attachShader("SimpleFragment",ngl::FRAGMENT);
+	shader->attachShader("SimpleVertex",ngl::ShaderType::VERTEX);
+	shader->attachShader("SimpleFragment",ngl::ShaderType::FRAGMENT);
 	shader->loadShaderSource("SimpleVertex","shaders/TextureVertex.glsl");
 	shader->loadShaderSource("SimpleFragment","shaders/TextureFragment.glsl");
 
