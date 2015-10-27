@@ -96,7 +96,7 @@ void NGLScene::initializeGL()
   // and make it active ready to load values
   (*shader)["Phong"]->use();
   // the shader will use the currently active material and light0 so set them
-  ngl::Material m(ngl::GOLD);
+  ngl::Material m(ngl::STDMAT::GOLD);
   // load our material values to the shader into the structure material (see Vertex shader)
   m.loadToShader("material");
   shader->setShaderParam3f("viewerPos",m_cam->getEye().m_x,m_cam->getEye().m_y,m_cam->getEye().m_z);
@@ -106,7 +106,7 @@ void NGLScene::initializeGL()
   ngl::Mat4 iv=m_cam->getViewMatrix();
   iv.transpose();
   iv=iv.inverse();
-  ngl::Light l(ngl::Vec3(0,1,0),ngl::Colour(1,1,1,1),ngl::Colour(1,1,1,1),ngl::POINTLIGHT);
+  ngl::Light l(ngl::Vec3(0,1,0),ngl::Colour(1,1,1,1),ngl::Colour(1,1,1,1),ngl::LightModes::POINTLIGHT);
   l.setTransform(iv);
   // load these values to the shader as well
   l.loadToShader("light");
