@@ -37,13 +37,12 @@ NGLScene::~NGLScene()
   m_vao->removeVOA();
 }
 
-void NGLScene::resizeGL(int _w, int _h)
+void NGLScene::resizeGL(QResizeEvent *_event)
 {
-  // set the viewport for openGL
-  glViewport(0,0,_w,_h);
+  m_width=_event->size().width()*devicePixelRatio();
+  m_height=_event->size().height()*devicePixelRatio();
   // now set the camera size values as the screen size has changed
-  m_cam->setShape(45,(float)_w/_h,0.05,350);
-  update();
+  m_cam.setShape(45.0f,(float)width()/height(),0.05f,350.0f);
 }
 
 
@@ -66,10 +65,10 @@ void NGLScene::initializeGL()
   ngl::Vec3 to(0,0,0);
   ngl::Vec3 up(0,1,0);
 
-  m_cam= new ngl::Camera(from,to,up);
+  m_cam.set(from,to,up);
   // set the shape using FOV 45 Aspect Ratio based on Width and Height
   // The final two are near and far clipping planes of 0.5 and 10
-  m_cam->setShape(45,(float)720.0/576.0,0.001,150);
+  m_cam.setShape(45,(float)720.0/576.0,0.001,150);
 
   // now to load the shader and set the values
   // grab an instance of shader manager
@@ -99,11 +98,11 @@ void NGLScene::initializeGL()
   ngl::Material m(ngl::STDMAT::GOLD);
   // load our material values to the shader into the structure material (see Vertex shader)
   m.loadToShader("material");
-  shader->setShaderParam3f("viewerPos",m_cam->getEye().m_x,m_cam->getEye().m_y,m_cam->getEye().m_z);
+  shader->setShaderParam3f("viewerPos",m_cam.getEye().m_x,m_cam.getEye().m_y,m_cam.getEye().m_z);
   // now create our light this is done after the camera so we can pass the
   // transpose of the projection matrix to the light to do correct eye space
   // transformations
-  ngl::Mat4 iv=m_cam->getViewMatrix();
+  ngl::Mat4 iv=m_cam.getViewMatrix();
   iv.transpose();
   iv=iv.inverse();
   ngl::Light l(ngl::Vec3(0,1,0),ngl::Colour(1,1,1,1),ngl::Colour(1,1,1,1),ngl::LightModes::POINTLIGHT);
@@ -157,7 +156,7 @@ void NGLScene::buildVAO()
 
   std::cout<<"sizeof(verts) "<<sizeof(verts)<<" sizeof(ngl::Vec3) "<<sizeof(ngl::Vec3)<<"\n";
   // create a vao as a series of GL_TRIANGLES
-  m_vao= ngl::VertexArrayObject::createVOA(GL_TRIANGLES);
+  m_vao.reset( ngl::VertexArrayObject::createVOA(GL_TRIANGLES));
   m_vao->bind();
 
   // in this case we are going to set our data as the vertices above
@@ -186,8 +185,7 @@ void NGLScene::paintGL()
 {
   // clear the screen and depth buffer
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  // Rotation based on the mouse position for our global transform
-  ngl::Transformation trans;
+  glViewport(0,0,m_width,m_height);
   // Rotation based on the mouse position for our global
   // transform
   ngl::Mat4 rotX;
@@ -211,8 +209,8 @@ void NGLScene::paintGL()
   ngl::Mat3 normalMatrix;
   ngl::Mat4 M;
   M=m_mouseGlobalTX;
-  MV=  M*m_cam->getViewMatrix();
-  MVP= M*m_cam->getVPMatrix();
+  MV=  M*m_cam.getViewMatrix();
+  MVP= M*m_cam.getVPMatrix();
   normalMatrix=MV;
   normalMatrix.inverse();
   shader->setShaderParamFromMat4("MV",MV);

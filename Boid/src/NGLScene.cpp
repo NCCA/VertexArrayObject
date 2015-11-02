@@ -37,14 +37,13 @@ NGLScene::~NGLScene()
   m_vao->removeVOA();
 }
 
-void NGLScene::resizeGL(int _w, int _h)
+void NGLScene::resizeGL(QResizeEvent *_event)
 {
-
-  // set the viewport for openGL
-  glViewport(0,0,_w,_h);
+  m_width=_event->size().width()*devicePixelRatio();
+  m_height=_event->size().height()*devicePixelRatio();
   // now set the camera size values as the screen size has changed
-  m_cam->setShape(45,(float)_w/_h,0.05,350);
- update();
+  m_cam.setShape(45.0f,(float)width()/height(),0.05f,350.0f);
+
 }
 
 
@@ -67,10 +66,10 @@ void NGLScene::initializeGL()
 	ngl::Vec3 to(0,0,0);
 	ngl::Vec3 up(0,1,0);
 
-	m_cam= new ngl::Camera(from,to,up);
+	m_cam.set(from,to,up);
 	// set the shape using FOV 45 Aspect Ratio based on Width and Height
 	// The final two are near and far clipping planes of 0.5 and 10
-	m_cam->setShape(45,(float)720.0/576.0,0.001,150);
+	m_cam.setShape(45,(float)720.0/576.0,0.001,150);
 
 // now to load the shader and set the values
 	// grab an instance of shader manager
@@ -102,7 +101,7 @@ void NGLScene::buildVAO()
   };
   std::cout<<"sizeof(verts) "<<sizeof(verts)<<" sizeof(ngl::Vec3) "<<sizeof(ngl::Vec3)<<"\n";
   // create a vao as a series of GL_TRIANGLES
-  m_vao= ngl::VertexArrayObject::createVOA(GL_TRIANGLES);
+  m_vao.reset( ngl::VertexArrayObject::createVOA(GL_TRIANGLES));
   m_vao->bind();
 
    // in this case we are going to set our data as the vertices above
@@ -145,7 +144,7 @@ void NGLScene::paintGL()
   (*shader)["nglColourShader"]->use();
 
   ngl::Mat4 MVP;
-  MVP=m_mouseGlobalTX*m_cam->getVPMatrix();
+  MVP=m_mouseGlobalTX*m_cam.getVPMatrix();
 
   shader->setShaderParamFromMat4("MVP",MVP);
 
