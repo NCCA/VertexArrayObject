@@ -35,6 +35,8 @@ NGLScene::NGLScene()
 NGLScene::~NGLScene()
 {
   std::cout<<"Shutting down NGL, removing VAO's and Shaders\n";
+  m_vao->removeVOA();
+
 }
 
 void NGLScene::resizeGL(QResizeEvent *_event)
@@ -87,6 +89,8 @@ void NGLScene::initializeGL()
 	glPointSize(10);
 	m_text.reset(new  ngl::Text(QFont("Arial",18)));
 	m_text->setScreenSize(width(),height());
+	// create the VAO but don't populate
+	m_vao.reset( ngl::VertexArrayObject::createVOA(GL_LINES));
 
 }
 
@@ -94,50 +98,41 @@ void NGLScene::initializeGL()
 
 void NGLScene::paintGL()
 {
-	// clear the screen and depth buffer
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	// Rotation based on the mouse position for our global transform
-	ngl::Transformation trans;
-	// Rotation based on the mouse position for our global
-	// transform
-	ngl::Mat4 rotX;
-	ngl::Mat4 rotY;
-	// create the rotation matrices
-	rotX.rotateX(m_spinXFace);
-	rotY.rotateY(m_spinYFace);
-	// multiply the rotations
-	m_mouseGlobalTX=rotY*rotX;
-	// add the translations
-	m_mouseGlobalTX.m_m[3][0] = m_modelPos.m_x;
-	m_mouseGlobalTX.m_m[3][1] = m_modelPos.m_y;
-	m_mouseGlobalTX.m_m[3][2] = m_modelPos.m_z;
-	ngl::ShaderLib *shader=ngl::ShaderLib::instance();
-	(*shader)["nglColourShader"]->use();
+  // clear the screen and depth buffer
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  // Rotation based on the mouse position for our global transform
+  ngl::Transformation trans;
+  // Rotation based on the mouse position for our global
+  // transform
+  ngl::Mat4 rotX;
+  ngl::Mat4 rotY;
+  // create the rotation matrices
+  rotX.rotateX(m_spinXFace);
+  rotY.rotateY(m_spinYFace);
+  // multiply the rotations
+  m_mouseGlobalTX=rotY*rotX;
+  // add the translations
+  m_mouseGlobalTX.m_m[3][0] = m_modelPos.m_x;
+  m_mouseGlobalTX.m_m[3][1] = m_modelPos.m_y;
+  m_mouseGlobalTX.m_m[3][2] = m_modelPos.m_z;
+  ngl::ShaderLib *shader=ngl::ShaderLib::instance();
+  (*shader)["nglColourShader"]->use();
 
-	ngl::Mat4 MVP;
-	MVP=m_mouseGlobalTX*m_cam.getVPMatrix();
+  ngl::Mat4 MVP;
+  MVP=m_mouseGlobalTX*m_cam.getVPMatrix();
 
-	shader->setShaderParamFromMat4("MVP",MVP);
+  shader->setShaderParamFromMat4("MVP",MVP);
+  m_vao->bind();
+  m_vao->setData(m_data.size()*sizeof(ngl::Vec3),m_data[0].m_x);
+  // We must do this each time as we change the data.
+  m_vao->setVertexAttributePointer(0,3,GL_FLOAT,0,0);
+  m_vao->setNumIndices(m_data.size());
+  m_vao->draw();
+  m_vao->unbind();
 
-	ngl::VertexArrayObject *vao =ngl::VertexArrayObject::createVOA(GL_LINES);
-	vao->bind();
-
-	// in this case we are going to set our data as the vertices above
-
-	vao->setData(m_data.size()*sizeof(ngl::Vec3),m_data[0].m_x);
-	// now we set the attribute pointer to be 0 (as this matches vertIn in our shader)
-
-	vao->setVertexAttributePointer(0,3,GL_FLOAT,0,0);
-
-
-	vao->setNumIndices(m_data.size());
-
-	vao->draw();
-	vao->unbind();
-	vao->removeVOA();
-	m_text->setColour(ngl::Colour(1,1,1));
-	QString text=QString("Data Size %1 ").arg(m_data.size());
-	m_text->renderText(10,18,text );
+  m_text->setColour(ngl::Colour(1,1,1));
+  QString text=QString("Data Size %1 ").arg(m_data.size());
+  m_text->renderText(10,18,text );
 
 }
 
