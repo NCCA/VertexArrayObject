@@ -5,11 +5,10 @@
 #include <ngl/Camera.h>
 #include <ngl/Light.h>
 #include <ngl/Transformation.h>
-#include <ngl/Texture.h>
-
 #include <ngl/Material.h>
 #include <ngl/NGLInit.h>
 #include <ngl/VAOPrimitives.h>
+#include <ngl/Random.h>
 #include <ngl/ShaderLib.h>
 
 
@@ -36,129 +35,14 @@ NGLScene::NGLScene()
 NGLScene::~NGLScene()
 {
   std::cout<<"Shutting down NGL, removing VAO's and Shaders\n";
-  m_vaoSphere->removeVOA();
 }
-
-
-// a simple structure to hold our vertex data
-struct vertData
-{
-  GLfloat u;
-  GLfloat v;
-  GLfloat nx;
-  GLfloat ny;
-  GLfloat nz;
-  GLfloat x;
-  GLfloat y;
-  GLfloat z;
-};
-
-void NGLScene::buildVAOSphere()
-{
-	//  Sphere code based on a function Written by Paul Bourke.
-	//  http://astronomy.swin.edu.au/~pbourke/opengl/sphere/
-	// first we grab an instance of our VOA class as a TRIANGLE_STRIP
-	m_vaoSphere= ngl::VertexArrayObject::createVOA(GL_TRIANGLE_STRIP);
-	// next we bind it so it's active for setting data
-	m_vaoSphere->bind();
-	// the next part of the code calculates the P,N,UV of the sphere for tri_strips
-	int buffSize;
-
-	float theta1 = 0.0;
-	float theta2 = 0.0;
-	float theta3 = 0.0;
-
-
-  float radius=1.0;
-  float precision=1000;
-  // a std::vector to store our verts, remember vector packs contiguously so we can use it
-  buffSize = (precision/2) * ((precision+1)*2);
-
-	std::vector <vertData> data(buffSize);
-	// calculate how big our buffer is
-	// Disallow a negative number for radius.
-	if( radius < 0 )
-	{
-	radius = -radius;
-	}
-	// Disallow a negative number for _precision.
-	if( precision < 4 )
-	{
-	precision = 4;
-	}
-	// now fill in a vertData structure and add to the data list for our sphere
-	vertData d;
-	unsigned int index=0;
-	for( int i = 0; i < precision/2; ++i )
-	{
-		theta1 = i * ngl::TWO_PI / precision - ngl::PI2;
-		theta2 = (i + 1) * ngl::TWO_PI / precision - ngl::PI2;
-
-		for( int j = 0; j <= precision; ++j )
-		{
-			theta3 = j * ngl::TWO_PI / precision;
-
-			d.nx = cosf(theta2) * cosf(theta3);
-			d.ny = sinf(theta2);
-			d.nz = cosf(theta2) * sinf(theta3);
-			d.x = radius * d.nx;
-			d.y = radius * d.ny;
-			d.z = radius * d.nz;
-
-			d.u  = (j/(float)precision);
-			d.v  = 2*(i+1)/(float)precision;
-
-			data[index++]=d;
-
-			d.nx = cosf(theta1) * cosf(theta3);
-			d.ny = sinf(theta1);
-			d.nz = cosf(theta1) * sinf(theta3);
-			d.x = radius * d.nx;
-			d.y = radius * d.ny;
-			d.z = radius * d.nz;
-
-			d.u  = (j/(float)precision);
-			d.v  = 2*i/(float)precision;
-			data[index++]=d;
-		} // end inner loop
-	}// end outer loop
-
-
-	// now we have our data add it to the VAO, we need to tell the VAO the following
-	// how much (in bytes) data we are copying
-	// a pointer to the first element of data (in this case the address of the first element of the
-	// std::vector
-	m_vaoSphere->setData(buffSize*sizeof(vertData),data[0].u);
-	// in this case we have packed our data in interleaved format as follows
-	// u,v,nx,ny,nz,x,y,z
-	// If you look at the shader we have the following attributes being used
-	// attribute vec3 inVert; attribute 0
-	// attribute vec2 inUV; attribute 1
-	// attribute vec3 inNormal; attribure 2
-	// so we need to set the vertexAttributePointer so the correct size and type as follows
-	// vertex is attribute 0 with x,y,z(3) parts of type GL_FLOAT, our complete packed data is
-	// sizeof(vertData) and the offset into the data structure for the first x component is 5 (u,v,nx,ny,nz)..x
-    m_vaoSphere->setVertexAttributePointer(0,3,GL_FLOAT,sizeof(vertData),5);
-	// uv same as above but starts at 0 and is attrib 1 and only u,v so 2
-	m_vaoSphere->setVertexAttributePointer(1,2,GL_FLOAT,sizeof(vertData),0);
-	// normal same as vertex only starts at position 2 (u,v)-> nx
-	m_vaoSphere->setVertexAttributePointer(2,3,GL_FLOAT,sizeof(vertData),2);
-	// now we have set the vertex attributes we tell the VAO class how many indices to draw when
-	// glDrawArrays is called, in this case we use buffSize (but if we wished less of the sphere to be drawn we could
-	// specify less (in steps of 3))
-	m_vaoSphere->setNumIndices(buffSize);
-	// finally we have finished for now so time to unbind the VAO
-	m_vaoSphere->unbind();
-}
-
-
 
 void NGLScene::resizeGL(QResizeEvent *_event)
 {
-	m_width=_event->size().width()*devicePixelRatio();
-	m_height=_event->size().height()*devicePixelRatio();
-	// now set the camera size values as the screen size has changed
-	m_cam.setShape(45.0f,(float)width()/height(),0.05f,350.0f);
+  m_width=_event->size().width()*devicePixelRatio();
+  m_height=_event->size().height()*devicePixelRatio();
+  // now set the camera size values as the screen size has changed
+  m_cam.setShape(45.0f,(float)width()/height(),0.05f,350.0f);
 }
 
 void NGLScene::resizeGL(int _w , int _h)
@@ -168,55 +52,43 @@ void NGLScene::resizeGL(int _w , int _h)
   m_height=_h*devicePixelRatio();
 }
 
+
 void NGLScene::initializeGL()
 {
   // we need to initialise the NGL lib which will load all of the OpenGL functions, this must
   // be done once we have a valid GL context but before we call any GL commands. If we dont do
   // this everything will crash
   ngl::NGLInit::instance();
-  glClearColor(0.4f, 0.4f, 0.4f, 1.0f);			   // Grey Background
-  // enable depth testing for drawing
-  glEnable(GL_DEPTH_TEST);
-  glEnable(GL_MULTISAMPLE);
-  // Now we will create a basic Camera from the graphics library
-  // This is a static camera so it only needs to be set once
-  // First create Values for the camera position
-  ngl::Vec3 from(0,1,2);
-  ngl::Vec3 to(0,0,0);
-  ngl::Vec3 up(0,1,0);
+
+	glClearColor(0.4f, 0.4f, 0.4f, 1.0f);			   // Grey Background
+	// enable depth testing for drawing
+
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_MULTISAMPLE);
+	// Now we will create a basic Camera from the graphics library
+	// This is a static camera so it only needs to be set once
+	// First create Values for the camera position
+	ngl::Vec3 from(0,1,2);
+	ngl::Vec3 to(0,0,0);
+	ngl::Vec3 up(0,1,0);
 
 	m_cam.set(from,to,up);
 	// set the shape using FOV 45 Aspect Ratio based on Width and Height
 	// The final two are near and far clipping planes of 0.5 and 10
 	m_cam.setShape(45,(float)720.0/576.0,0.001,150);
-	// now to load the shader and set the values
+
+// now to load the shader and set the values
 	// grab an instance of shader manager
 	ngl::ShaderLib *shader=ngl::ShaderLib::instance();
-	// load a frag and vert shaders
-
-	shader->createShaderProgram("TextureShader");
-
-	shader->attachShader("SimpleVertex",ngl::ShaderType::VERTEX);
-	shader->attachShader("SimpleFragment",ngl::ShaderType::FRAGMENT);
-	shader->loadShaderSource("SimpleVertex","shaders/TextureVertex.glsl");
-	shader->loadShaderSource("SimpleFragment","shaders/TextureFragment.glsl");
-
-	shader->compileShader("SimpleVertex");
-	shader->compileShader("SimpleFragment");
-	shader->attachShaderToProgram("TextureShader","SimpleVertex");
-	shader->attachShaderToProgram("TextureShader","SimpleFragment");
-
-
-	shader->linkProgramObject("TextureShader");
-	(*shader)["TextureShader"]->use();
-	// build our VertexArrayObject
-	buildVAOSphere();
-	// load and set a texture
-	ngl::Texture t("textures/earth.png");
-	t.setTextureGL();
+	shader->use("nglColourShader");
+	shader->setRegisteredUniform4f("Colour",1,1,1,1);
+	glViewport(0,0,width(),height());
+	startTimer(250);
+	glPointSize(10);
+	m_text.reset(new  ngl::Text(QFont("Arial",18)));
+	m_text->setScreenSize(width(),height());
 
 }
-
 
 
 
@@ -224,7 +96,8 @@ void NGLScene::paintGL()
 {
   // clear the screen and depth buffer
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glViewport(0,0,m_width,m_height);
+  // Rotation based on the mouse position for our global transform
+  ngl::Transformation trans;
   // Rotation based on the mouse position for our global
   // transform
   ngl::Mat4 rotX;
@@ -238,22 +111,51 @@ void NGLScene::paintGL()
   m_mouseGlobalTX.m_m[3][0] = m_modelPos.m_x;
   m_mouseGlobalTX.m_m[3][1] = m_modelPos.m_y;
   m_mouseGlobalTX.m_m[3][2] = m_modelPos.m_z;
+  ngl::ShaderLib *shader=ngl::ShaderLib::instance();
+  (*shader)["nglColourShader"]->use();
+
+  ngl::Mat4 MVP;
+  MVP=m_mouseGlobalTX*m_cam.getVPMatrix();
+
+  shader->setShaderParamFromMat4("MVP",MVP);
+
+  ngl::VertexArrayObject *vao =ngl::VertexArrayObject::createVOA(GL_LINES);
+  vao->bind();
+
+   // in this case we are going to set our data as the vertices above
+
+   vao->setData(m_data.size()*sizeof(ngl::Vec3),m_data[0].m_x);
+   // now we set the attribute pointer to be 0 (as this matches vertIn in our shader)
+
+   vao->setVertexAttributePointer(0,3,GL_FLOAT,0,0);
 
 
-	ngl::ShaderLib *shader=ngl::ShaderLib::instance();
-	(*shader)["TextureShader"]->use();
-	ngl::Mat4 MVP;
-	MVP=m_mouseGlobalTX*m_cam.getVPMatrix();
+   vao->setNumIndices(m_data.size());
 
-	shader->setShaderParamFromMat4("MVP",MVP);
-
-	// now we bind back our vertex array object and draw
-	m_vaoSphere->bind();
-	m_vaoSphere->draw();
-	// now we are done so unbind
-	m_vaoSphere->unbind();
+  vao->draw();
+  vao->unbind();
+  vao->removeVOA();
+  m_text->setColour(ngl::Colour(1,1,1));
+  QString text=QString("Data Size %1 ").arg(m_data.size());
+   m_text->renderText(10,18,text );
 
 }
+
+
+void NGLScene::timerEvent(QTimerEvent *_event)
+{
+  NGL_UNUSED(_event);
+  m_data.clear();
+  ngl::Random *rng = ngl::Random::instance();
+  m_data.resize(2*(int)rng->randomPositiveNumber(500));
+  for(auto &p : m_data)
+  {
+    p=rng->getRandomVec3()*5;
+  }
+
+  update();
+}
+
 
 //----------------------------------------------------------------------------------------------------------------------
 void NGLScene::mouseMoveEvent (QMouseEvent * _event)
