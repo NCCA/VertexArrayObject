@@ -139,7 +139,7 @@ void NGLScene::buildVAO()
     ngl::Vec3(0.5,0,1)
 
   };
-
+  std::cout<<"Initial "<<verts.size()<<'\n';
   ngl::Vec3 n=ngl::calcNormal(verts[2],verts[1],verts[0]);
   verts.push_back(n);
   verts.push_back(n);
@@ -172,8 +172,8 @@ void NGLScene::buildVAO()
 	m_vao->setVertexAttributePointer(0,3,GL_FLOAT,0,0);
 
 	// now we set the attribute pointer to be 2 (as this matches normal in our shader)
-
-  m_vao->setVertexAttributePointer(2,3,GL_FLOAT,12,0);
+  // as we cast to ngl::Real for offset use 12 * 3 (as in x,y,z is 3 floats)
+  m_vao->setVertexAttributePointer(2,3,GL_FLOAT,0,12*3);
   m_vao->setNumIndices(verts.size());
 
  // now unbind
