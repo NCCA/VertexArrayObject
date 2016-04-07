@@ -103,7 +103,6 @@ void NGLScene::buildVAO()
     ngl::Vec3(0,1,1),
     ngl::Vec3(0,0,1.5),
     ngl::Vec3(0.5,0,1)
-
   };
   std::cout<<"sizeof(verts) "<<sizeof(verts)<<" sizeof(ngl::Vec3) "<<sizeof(ngl::Vec3)<<"\n";
   // create a vao as a series of GL_TRIANGLES
@@ -156,7 +155,17 @@ void NGLScene::paintGL()
 
 
   m_vao->bind();
+  shader->setShaderParamFromMat4("MVP",MVP);
   m_vao->draw();
+
+  ngl::Mat4 tx;
+  tx.translate(0,2,0);
+  MVP=m_mouseGlobalTX*m_cam.getVPMatrix()*tx;
+
+  shader->setShaderParamFromMat4("MVP",MVP);
+  m_vao->draw();
+
+
   m_vao->unbind();
 }
 

@@ -3,7 +3,6 @@
 // this is a pointer to the current 2D texture object
 uniform sampler2D tex;
 in vec2 vertUV;
-in vec3 normal;
 layout (location=0)out vec4 outColour;
 void main ()
 {

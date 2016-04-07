@@ -129,7 +129,6 @@ void NGLScene::paintGL()
 
 	vao->setVertexAttributePointer(0,3,GL_FLOAT,0,0);
 
-
 	vao->setNumIndices(m_data.size());
 
 	vao->draw();
