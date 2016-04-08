@@ -111,8 +111,9 @@ void NGLScene::initializeGL()
 void NGLScene::buildVAO()
 {
   // data from here http://rbwhitaker.wikidot.com/index-and-vertex-buffers
-  std::vector<ngl::Vec3> vertAndColour=
+  std::array<ngl::Vec3,24> vertAndColour=
   {
+   {
    ngl::Vec3(-0.26286500f, 0.0000000f, 0.42532500f), ngl::Vec3(1.0f,0.0f,0.0f),
    ngl::Vec3(0.26286500f, 0.0000000f, 0.42532500f), ngl::Vec3(1.0f,0.55f,0.0f),
    ngl::Vec3(-0.26286500f, 0.0000000f, -0.42532500f),  ngl::Vec3(1.0f,0.0f,1.0f),
@@ -125,6 +126,7 @@ void NGLScene::buildVAO()
    ngl::Vec3(-0.42532500f, 0.26286500f, 0.0000000f),  ngl::Vec3(0.0f,0.0f,0.0f),
    ngl::Vec3(0.42532500f, -0.26286500f, 0.0000000f),  ngl::Vec3(0.12f,0.56f,1.0f),
    ngl::Vec3(-0.42532500f, -0.26286500f, 0.0000000f),  ngl::Vec3(0.86f,0.08f,0.24f)
+  }
   };
 
   std::array<GLshort,60> indices=
@@ -142,12 +144,10 @@ void NGLScene::buildVAO()
 
   reinterpret_cast<ngl::SimpleIndexVAO *>( m_vao.get())->setData(vertAndColour.size()*sizeof(ngl::Vec3),
                                                                  vertAndColour[0].m_x,
-                                                                 sizeof(indices),
-                                                                  &indices[0],
-                                                                  GL_UNSIGNED_SHORT,
+                                                                 sizeof(indices),&indices[0],                                                                 GL_UNSIGNED_SHORT,
                                                                   GL_STATIC_DRAW);
-  // now we set the attribute pointer to be 0 (as this matches vertIn in our shader)
-
+  // data is 24 bytes apart ( two Vec3's) first index
+  // is 0 second is 3 floats into the data set (i.e. vec3 offset)
   m_vao->setVertexAttributePointer(0,3,GL_FLOAT,24,0);
   m_vao->setVertexAttributePointer(1,3,GL_FLOAT,24,3);
   m_vao->setNumIndices(indices.size());
