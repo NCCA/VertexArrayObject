@@ -11,9 +11,8 @@ Vertex * 12
 Normal * 12
 
 in a contiguous array as we need to do the following offset
-```
-	m_vao->setVertexAttributePointer(0,3,GL_FLOAT,0,0);
-  m_vao->setVertexAttributePointer(2,3,GL_FLOAT,0,12*3);
+```m_vao->setVertexAttributePointer(0,3,GL_FLOAT,0,0);
+m_vao->setVertexAttributePointer(2,3,GL_FLOAT,0,12*3);
 ```
 Where the first sets the offset to 0 in the buffer (first 0 means tightly packed data), and the second is the 12 * (x,y,z) data offset for the next block of data in the buffer.
 
