@@ -13,11 +13,11 @@
 //----------------------------------------------------------------------------------------------------------------------
 /// @brief the increment for x/y translation with mouse movement
 //----------------------------------------------------------------------------------------------------------------------
-const static float INCREMENT=0.01;
+constexpr float INCREMENT=0.01f;
 //----------------------------------------------------------------------------------------------------------------------
 /// @brief the increment for the wheel zoom
 //----------------------------------------------------------------------------------------------------------------------
-const static float ZOOM=0.1;
+constexpr float ZOOM=0.1f;
 
 NGLScene::NGLScene()
 {
@@ -38,17 +38,17 @@ NGLScene::~NGLScene()
 
 void NGLScene::resizeGL(QResizeEvent *_event)
 {
-  m_width=_event->size().width()*devicePixelRatio();
-  m_height=_event->size().height()*devicePixelRatio();
+  m_width=static_cast<int>(_event->size().width()*devicePixelRatio());
+  m_height=static_cast<int>(_event->size().height()*devicePixelRatio());
   // now set the camera size values as the screen size has changed
-  m_cam.setShape(45.0f,(float)width()/height(),0.05f,350.0f);
+  m_cam.setShape(45.0f,static_cast<float>(width())/height(),0.05f,350.0f);
 }
 
 void NGLScene::resizeGL(int _w , int _h)
 {
-  m_cam.setShape(45.0f,(float)_w/_h,0.05f,350.0f);
-  m_width=_w*devicePixelRatio();
-  m_height=_h*devicePixelRatio();
+  m_cam.setShape(45.0f,static_cast<float>(_w)/_h,0.05f,350.0f);
+  m_width=static_cast<int>(_w*devicePixelRatio());
+  m_height=static_cast<int>(_h*devicePixelRatio());
 }
 
 
@@ -117,6 +117,7 @@ void NGLScene::initializeGL()
   l.loadToShader("light");
 
   buildVAO();
+  ngl::VAOFactory::listCreators();
   glViewport(0,0,width(),height());
 }
 
