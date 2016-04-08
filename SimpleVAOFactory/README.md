@@ -3,14 +3,12 @@ This demo shows how to create a simple Boid shaped object using the built in Sim
 
 In this case we use the ngl built in SimpleVAO which takes one buffer of data and loads it into the VAO.
 
-We then need to set the setVertexAttributePointer for the data.
-
-In this case we have
+We then need to set the setVertexAttributePointer for the data. In this case we have
 
 Vertex * 12
 Normal * 12
 
-in a contiguous array as we need to do the following offset
+in a contiguous array so we need to do the following offset for the generic vertex attributes
 ```
 m_vao->setVertexAttributePointer(0,3,GL_FLOAT,0,0);
 m_vao->setVertexAttributePointer(2,3,GL_FLOAT,0,12*3);
