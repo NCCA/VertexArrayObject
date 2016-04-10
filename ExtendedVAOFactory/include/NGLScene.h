@@ -141,7 +141,7 @@ private:
     //----------------------------------------------------------------------------------------------------------------------
     void buildVAO();
     int m_index=0;
-    bool m_animate=false;
+    bool m_animate=true;
     void timerEvent(QTimerEvent *);
 
 

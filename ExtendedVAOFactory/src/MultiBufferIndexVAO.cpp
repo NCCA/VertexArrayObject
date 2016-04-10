@@ -95,6 +95,6 @@ void MultiBufferIndexVAO::setIndices(unsigned int _indexSize,const GLvoid *_inde
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, iboID);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, _indexSize * static_cast<GLsizeiptr>(size), const_cast<GLvoid *>(_indexData), _mode);
   m_indexType=_indexType;
-
-
 }
+
+
