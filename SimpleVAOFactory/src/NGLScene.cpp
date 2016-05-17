@@ -167,7 +167,7 @@ void NGLScene::buildVAO()
   m_vao->bind();
 
   // in this case we are going to set our data as the vertices above
-  reinterpret_cast<ngl::SimpleVAO *>( m_vao.get())->setData(verts.size()*sizeof(ngl::Vec3),verts[0].m_x);
+  m_vao->setData(ngl::SimpleVAO::VertexData(verts.size()*sizeof(ngl::Vec3),verts[0].m_x));
   // now we set the attribute pointer to be 0 (as this matches vertIn in our shader)
 
 	m_vao->setVertexAttributePointer(0,3,GL_FLOAT,0,0);

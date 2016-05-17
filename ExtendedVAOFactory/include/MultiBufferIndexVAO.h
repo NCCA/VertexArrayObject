@@ -7,6 +7,7 @@
 class  MultiBufferIndexVAO : public ngl::AbstractVAO
 {
   public :
+
     //----------------------------------------------------------------------------------------------------------------------
     /// @brief creator method for the factory
     /// @param _mode the mode to draw with.
@@ -37,9 +38,9 @@ class  MultiBufferIndexVAO : public ngl::AbstractVAO
     /// @param _indexType the type of the values in the indices buffer. Must be one of GL_UNSIGNED_BYTE, GL_UNSIGNED_SHORT, or GL_UNSIGNED_INT.
     /// @param _mode the draw mode hint used by GL
     //----------------------------------------------------------------------------------------------------------------------
-    void setData(size_t _size,const GLfloat &_data,GLenum _mode=GL_STATIC_DRAW);
-
+    virtual void setData(const VertexData &_data);
     void setIndices(unsigned int _indexSize,const GLvoid *_indexData,GLenum _indexType,GLenum _mode=GL_STATIC_DRAW);
+
     //----------------------------------------------------------------------------------------------------------------------
     /// @brief return the id of the buffer, if there is only 1 buffer just return this
     /// if we have the more than one buffer the sub class manages the id's

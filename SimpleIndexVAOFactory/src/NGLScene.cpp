@@ -142,10 +142,11 @@ void NGLScene::buildVAO()
 
   // in this case we are going to set our data as the vertices above
 
-  reinterpret_cast<ngl::SimpleIndexVAO *>( m_vao.get())->setData(vertAndColour.size()*sizeof(ngl::Vec3),
-                                                                 vertAndColour[0].m_x,
-                                                                 sizeof(indices),&indices[0],                                                                 GL_UNSIGNED_SHORT,
-                                                                  GL_STATIC_DRAW);
+  m_vao->setData(ngl::SimpleIndexVAO::VertexData(
+                                                  vertAndColour.size()*sizeof(ngl::Vec3),
+                                                  vertAndColour[0].m_x,
+                                                  sizeof(indices),&indices[0],
+                                                  GL_UNSIGNED_SHORT));
   // data is 24 bytes apart ( two Vec3's) first index
   // is 0 second is 3 floats into the data set (i.e. vec3 offset)
   m_vao->setVertexAttributePointer(0,3,GL_FLOAT,24,0);

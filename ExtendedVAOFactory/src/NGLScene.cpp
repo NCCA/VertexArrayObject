@@ -161,11 +161,15 @@ void NGLScene::buildVAO()
 
   // in this case we are going to set our data as the vertices above
 
-  reinterpret_cast<MultiBufferIndexVAO *>( m_vao.get())->setData(verts.size()*sizeof(ngl::Vec3),verts[0].m_x);
+  //reinterpret_cast<MultiBufferIndexVAO *>( m_vao.get())->setData(verts.size()*sizeof(ngl::Vec3),verts[0].m_x);
+  m_vao->setData(MultiBufferIndexVAO::VertexData(verts.size()*sizeof(ngl::Vec3),verts[0].m_x));
   m_vao->setVertexAttributePointer(0,3,GL_FLOAT,0,0);
-  reinterpret_cast<MultiBufferIndexVAO *>( m_vao.get())->setData(colours.size()*sizeof(ngl::Vec3),colours[0].m_x);
+  //reinterpret_cast<MultiBufferIndexVAO *>( m_vao.get())->setData(colours.size()*sizeof(ngl::Vec3),colours[0].m_x);
+  m_vao->setData(MultiBufferIndexVAO::VertexData(colours.size()*sizeof(ngl::Vec3),colours[0].m_x));
+
   m_vao->setVertexAttributePointer(1,3,GL_FLOAT,0,3);
-  reinterpret_cast<MultiBufferIndexVAO *>( m_vao.get())->setIndices(sizeof(indices),&indices[0], GL_UNSIGNED_SHORT);
+  // as we are storing the abstract we need to get the concrete here to call setIndices, do a quick cast
+  static_cast<MultiBufferIndexVAO *>( m_vao.get())->setIndices(sizeof(indices),&indices[0], GL_UNSIGNED_SHORT);
   // data is 24 bytes apart ( two Vec3's) first index
   // is 0 second is 3 floats into the data set (i.e. vec3 offset)
   m_vao->setNumIndices(indices.size());
@@ -202,8 +206,18 @@ void NGLScene::paintGL()
   m_vao->bind();
 
   ngl::Transformation t;
+
   t.setPosition(-1.2f,0.0f,0.0f);
   ngl::Mat4 MVP= m_mouseGlobalTX*t.getMatrix()*m_cam.getVPMatrix();
+  shader->setUniform("MVP",MVP);
+
+  reinterpret_cast<MultiBufferIndexVAO *>( m_vao.get())->draw(0,m_index*3);
+
+
+
+  t.setPosition(0.0f,0.0f,0.0f);
+
+   MVP= m_mouseGlobalTX*t.getMatrix()*m_cam.getVPMatrix();
   shader->setUniform("MVP",MVP);
 
   glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
@@ -221,11 +235,6 @@ void NGLScene::paintGL()
 
   glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
 
-  t.setPosition(0.0f,0.0f,0.0f);
-  MVP= m_mouseGlobalTX*t.getMatrix()*m_cam.getVPMatrix();
-  shader->setUniform("MVP",MVP);
-
-  reinterpret_cast<MultiBufferIndexVAO *>( m_vao.get())->draw(0,m_index*3);
 
 
   m_vao->unbind();

@@ -168,12 +168,11 @@ void NGLScene::buildVAO()
   m_vao->bind();
 
   // in this case we are going to set our data as the vertices above
-  reinterpret_cast<ngl::MultiBufferVAO *>( m_vao.get())->setData(sizeof(verts),verts[0].m_x);
-
+  m_vao->setData(ngl::MultiBufferVAO::VertexData(sizeof(verts),verts[0].m_x));
   // now we set the attribute pointer to be 0 (as this matches vertIn in our shader)
 
   m_vao->setVertexAttributePointer(0,3,GL_FLOAT,0,0);
-  reinterpret_cast<ngl::MultiBufferVAO *>( m_vao.get())->setData( sizeof(verts),normals[0].m_x);
+  m_vao->setData(ngl::MultiBufferVAO::VertexData(sizeof(verts),normals[0].m_x));
 
   // now we set the attribute pointer to be 2 (as this matches normal in our shader)
 

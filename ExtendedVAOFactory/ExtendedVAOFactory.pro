@@ -1,5 +1,5 @@
 # This specifies the exe name
-TARGET=ExtendVAOFactory
+TARGET=ExtendedVAOFactory
 # where to put the .o files
 OBJECTS_DIR=obj
 # core Qt Libs to use add more here if needed.
