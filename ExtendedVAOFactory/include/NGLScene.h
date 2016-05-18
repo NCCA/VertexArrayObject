@@ -1,10 +1,10 @@
-#ifndef NGLSCENE_H__
-#define NGLSCENE_H__
+#ifndef NGLSCENE_H_
+#define NGLSCENE_H_
 #include <ngl/Camera.h>
 #include <ngl/Colour.h>
 #include <ngl/Light.h>
 #include <ngl/Text.h>
-#include <ngl/SimpleVAO.h>
+#include "MultiBufferIndexVAO.h"
 #include <QOpenGLWindow>
 
 #include <memory>
@@ -106,7 +106,7 @@ private:
     //----------------------------------------------------------------------------------------------------------------------
     /// @brief a simple light use to illuminate the screen
     //----------------------------------------------------------------------------------------------------------------------
-    std::unique_ptr<ngl::AbstractVAO> m_vao;
+    std::unique_ptr<MultiBufferIndexVAO> m_vao;
     //----------------------------------------------------------------------------------------------------------------------
     /// @brief Qt Event called when a key is pressed
     /// @param [in] _event the Qt event to query for size etc

@@ -156,20 +156,18 @@ void NGLScene::buildVAO()
     8,10, 3,9,11, 0}
   };
   // create a vao as a series of GL_TRIANGLES
-  m_vao.reset(ngl::VAOFactory::createVAO("multiBufferIndexVAO",GL_TRIANGLES) );
+  m_vao.reset(static_cast<MultiBufferIndexVAO *>( ngl::VAOFactory::createVAO("multiBufferIndexVAO",GL_TRIANGLES)) );
   m_vao->bind();
 
   // in this case we are going to set our data as the vertices above
 
-  //reinterpret_cast<MultiBufferIndexVAO *>( m_vao.get())->setData(verts.size()*sizeof(ngl::Vec3),verts[0].m_x);
   m_vao->setData(MultiBufferIndexVAO::VertexData(verts.size()*sizeof(ngl::Vec3),verts[0].m_x));
   m_vao->setVertexAttributePointer(0,3,GL_FLOAT,0,0);
-  //reinterpret_cast<MultiBufferIndexVAO *>( m_vao.get())->setData(colours.size()*sizeof(ngl::Vec3),colours[0].m_x);
   m_vao->setData(MultiBufferIndexVAO::VertexData(colours.size()*sizeof(ngl::Vec3),colours[0].m_x));
 
   m_vao->setVertexAttributePointer(1,3,GL_FLOAT,0,3);
   // as we are storing the abstract we need to get the concrete here to call setIndices, do a quick cast
-  static_cast<MultiBufferIndexVAO *>( m_vao.get())->setIndices(sizeof(indices),&indices[0], GL_UNSIGNED_SHORT);
+  m_vao->setIndices(sizeof(indices),&indices[0], GL_UNSIGNED_SHORT);
   // data is 24 bytes apart ( two Vec3's) first index
   // is 0 second is 3 floats into the data set (i.e. vec3 offset)
   m_vao->setNumIndices(indices.size());
