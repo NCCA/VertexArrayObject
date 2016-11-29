@@ -4,7 +4,7 @@
 #include <ngl/Colour.h>
 #include <ngl/Light.h>
 #include <ngl/Text.h>
-#include <ngl/MultiBufferVAO.h>
+#include <ngl/AbstractVAO.h>
 #include "WindowParams.h"
 #include <QOpenGLWindow>
 

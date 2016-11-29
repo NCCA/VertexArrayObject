@@ -10,11 +10,12 @@
 #include <ngl/VAOPrimitives.h>
 #include <ngl/ShaderLib.h>
 #include <ngl/VAOFactory.h>
+#include <ngl/MultiBufferVAO.h>
 
 
 NGLScene::NGLScene()
 {
-  setTitle("Qt5 Simple VAOFactory NGL Demo");
+  setTitle("Qt5 MultiBufferVAO VAOFactory NGL Demo");
 }
 
 
@@ -106,8 +107,8 @@ void NGLScene::initializeGL()
 
 void NGLScene::buildVAO()
 {
-  ngl::Vec3 verts[]=
-  {
+  std::array<ngl::Vec3,12> verts=
+  {{
     ngl::Vec3(0,1,1),
     ngl::Vec3(0,0,-1),
     ngl::Vec3(-0.5,0,1),
@@ -121,7 +122,7 @@ void NGLScene::buildVAO()
     ngl::Vec3(0,0,1.5),
     ngl::Vec3(0.5,0,1)
 
-  };
+  }};
 
   std::vector <ngl::Vec3> normals;
   ngl::Vec3 n=ngl::calcNormal(verts[2],verts[1],verts[0]);
@@ -145,22 +146,21 @@ void NGLScene::buildVAO()
 
   std::cout<<"sizeof(verts) "<<sizeof(verts)<<" sizeof(ngl::Vec3) "<<sizeof(ngl::Vec3)<<"\n";
   // create a vao as a series of GL_TRIANGLES
-  m_vao.reset(ngl::VAOFactory::createVAO("multiBufferVAO",GL_TRIANGLES) );
+  m_vao.reset(ngl::VAOFactory::createVAO(ngl::multiBufferVAO,GL_TRIANGLES) );
 
   m_vao->bind();
 
   // in this case we are going to set our data as the vertices above
   m_vao->setData(ngl::MultiBufferVAO::VertexData(sizeof(verts),verts[0].m_x));
   // now we set the attribute pointer to be 0 (as this matches vertIn in our shader)
-
   m_vao->setVertexAttributePointer(0,3,GL_FLOAT,0,0);
+
+  // 2nd buffer with normals
   m_vao->setData(ngl::MultiBufferVAO::VertexData(sizeof(verts),normals[0].m_x));
-
   // now we set the attribute pointer to be 2 (as this matches normal in our shader)
-
   m_vao->setVertexAttributePointer(2,3,GL_FLOAT,0,0);
 
-  m_vao->setNumIndices(sizeof(verts)/sizeof(ngl::Vec3));
+  m_vao->setNumIndices(verts.size());
 
  // now unbind
   m_vao->unbind();

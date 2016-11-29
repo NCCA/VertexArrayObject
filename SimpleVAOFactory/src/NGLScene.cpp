@@ -147,7 +147,7 @@ void NGLScene::buildVAO()
 
   std::cout<<"sizeof(verts) "<<sizeof(verts)<<" sizeof(ngl::Vec3) "<<sizeof(ngl::Vec3)<<"\n";
   // create a vao as a series of GL_TRIANGLES
-  m_vao.reset(ngl::VAOFactory::createVAO("simpleVAO",GL_TRIANGLES) );
+  m_vao.reset(ngl::VAOFactory::createVAO(ngl::simpleVAO,GL_TRIANGLES) );
   m_vao->bind();
 
   // in this case we are going to set our data as the vertices above
@@ -159,7 +159,8 @@ void NGLScene::buildVAO()
 	// now we set the attribute pointer to be 2 (as this matches normal in our shader)
   // as we cast to ngl::Real for offset use 12 * 3 (as in x,y,z is 3 floats)
   m_vao->setVertexAttributePointer(2,3,GL_FLOAT,0,12*3);
-  m_vao->setNumIndices(verts.size());
+  // divide by 2 as we have both verts and normals
+  m_vao->setNumIndices(verts.size()/2);
 
  // now unbind
   m_vao->unbind();

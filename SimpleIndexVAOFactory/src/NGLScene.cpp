@@ -16,7 +16,7 @@
 NGLScene::NGLScene()
 {
 
-  setTitle("Qt5 SimpleInexVAO created from VAOFactory NGL Demo");
+  setTitle("Qt5 SimpleIndexVAO created from VAOFactory NGL Demo");
 }
 
 
@@ -110,19 +110,19 @@ void NGLScene::buildVAO()
 
   std::array<GLshort,60> indices=
   {
-    {0, 6,1,0,11, 6,1, 4, 0,1, 8, 4,1,10, 8,2, 5, 3,
-    2, 9, 5,2,11, 9,3, 7, 2,3,10, 7,4, 8, 5,4, 9, 0,
-    5, 8, 3,5, 9, 4,6,10, 1,6,11, 7,7,10, 6,7,11, 2,
-    8,10, 3,9,11, 0}
+    {0,6,1,0,11,6,1,4,0,1,8,4,1,10,8,2,5,3,
+    2,9,5,2,11,9,3,7,2,3,10,7,4,8,5,4,9,0,
+    5,8,3,5,9,4,6,10,1,6,11,7,7,10,6,7,11,2,
+    8,10,3,9,11,0}
   };
   // create a vao as a series of GL_TRIANGLES
-  m_vao.reset(ngl::VAOFactory::createVAO("simpleIndexVAO",GL_TRIANGLES) );
+  m_vao.reset(ngl::VAOFactory::createVAO(ngl::simpleIndexVAO,GL_TRIANGLES) );
   m_vao->bind();
 
   // in this case we are going to set our data as the vertices above
 
   m_vao->setData(ngl::SimpleIndexVAO::VertexData(
-                                                  vertAndColour.size()*sizeof(ngl::Vec3),
+                                                  sizeof(vertAndColour),
                                                   vertAndColour[0].m_x,
                                                   sizeof(indices),&indices[0],
                                                   GL_UNSIGNED_SHORT));

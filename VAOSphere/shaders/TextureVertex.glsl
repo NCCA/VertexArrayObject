@@ -4,8 +4,8 @@
 uniform mat4 MVP;
 
 layout (location=0)in vec3 inVert;
-layout (location=1)in vec2 inUV;
-layout (location=2)in vec3 inNormal;
+layout (location=1)in vec3 inNormal;
+layout (location=2)in vec2 inUV;
 
 out vec2 vertUV;
 
