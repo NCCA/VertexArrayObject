@@ -68,6 +68,7 @@ class MainWindow(QOpenGLWindow) :
           Vec3(0.5,0.0,1.0)
     ]
 
+    
     n=calcNormal(verts[2],verts[1],verts[0]);
     verts.append(n);
     verts.append(n);

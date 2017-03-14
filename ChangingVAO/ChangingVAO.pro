@@ -25,7 +25,9 @@ INCLUDEPATH +=./include
 # where our exe is going to live (root of project)
 DESTDIR=./
 # add the glsl shader files
-OTHER_FILES+= README.md
+OTHER_FILES+= README.md \
+              ChangingVAO.py
+
 # were are going to default to a console app
 CONFIG += console
 
