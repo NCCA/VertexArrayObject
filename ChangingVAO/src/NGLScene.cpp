@@ -17,6 +17,7 @@
 NGLScene::NGLScene()
 {
   setTitle("Qt5 Simple NGL Demo");
+  m_data.resize(123456);
 }
 
 
@@ -68,7 +69,7 @@ void NGLScene::initializeGL()
 	m_text.reset(new  ngl::Text(QFont("Arial",18)));
 	m_text->setScreenSize(width(),height());
 	// create the VAO but don't populate
-  m_vao.reset( ngl::VAOFactory::createVAO("simpleVAO",GL_LINES));
+  m_vao.reset( ngl::VAOFactory::createVAO(ngl::simpleVAO,GL_LINES));
 
 }
 
@@ -119,9 +120,9 @@ void NGLScene::timerEvent(QTimerEvent *_event)
 {
   NGL_UNUSED(_event);
   // clear out old data ready to add new
-  m_data.clear();
+  //m_data.clear();
   ngl::Random *rng = ngl::Random::instance();
-  m_data.resize(2*static_cast<size_t>(rng->randomPositiveNumber(500)));
+  //m_data.resize(2*static_cast<size_t>(rng->randomPositiveNumber(3500)));
   // note reference as mutating vector
   for(auto &p : m_data)
   {
