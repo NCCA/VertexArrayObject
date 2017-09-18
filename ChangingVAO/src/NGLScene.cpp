@@ -62,7 +62,7 @@ void NGLScene::initializeGL()
 	// grab an instance of shader manager
 	ngl::ShaderLib *shader=ngl::ShaderLib::instance();
 	shader->use("nglColourShader");
-	shader->setRegisteredUniform4f("Colour",1,1,1,1);
+  shader->setUniform("Colour",1.0f,1.0f,1.0f,1.0f);
 	glViewport(0,0,width(),height());
 	startTimer(250);
 	glPointSize(10);
@@ -100,7 +100,7 @@ void NGLScene::paintGL()
   ngl::Mat4 MVP;
   MVP=m_mouseGlobalTX*m_cam.getVPMatrix();
 
-  shader->setShaderParamFromMat4("MVP",MVP);
+  shader->setUniform("MVP",MVP);
   m_vao->bind();
   m_vao->setData( ngl::SimpleVAO::VertexData(m_data.size()*sizeof(ngl::Vec3),m_data[0].m_x));
   // We must do this each time as we change the data.

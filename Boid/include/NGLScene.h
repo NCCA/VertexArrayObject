@@ -4,7 +4,6 @@
 #include <ngl/Colour.h>
 #include <ngl/Light.h>
 #include <ngl/Text.h>
-#include <ngl/VertexArrayObject.h>
 #include "WindowParams.h"
 #include <QOpenGLWindow>
 #include <memory>
@@ -70,7 +69,7 @@ private:
     //----------------------------------------------------------------------------------------------------------------------
     /// @brief a simple light use to illuminate the screen
     //----------------------------------------------------------------------------------------------------------------------
-    std::unique_ptr<ngl::VertexArrayObject> m_vao;
+    std::unique_ptr<ngl::AbstractVAO> m_vao;
     //----------------------------------------------------------------------------------------------------------------------
     /// @brief Qt Event called when a key is pressed
     /// @param [in] _event the Qt event to query for size etc

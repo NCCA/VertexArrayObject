@@ -88,7 +88,7 @@ void NGLScene::initializeGL()
   ngl::Material m( ngl::STDMAT::GOLD );
   // load our material values to the shader into the structure material (see Vertex shader)
   m.loadToShader( "material" );
-  shader->setShaderParam3f("viewerPos",m_cam.getEye().m_x,m_cam.getEye().m_y,m_cam.getEye().m_z);
+  shader->setUniform("viewerPos",m_cam.getEye().m_x,m_cam.getEye().m_y,m_cam.getEye().m_z);
   // now create our light this is done after the camera so we can pass the
   // transpose of the projection matrix to the light to do correct eye space
   // transformations
@@ -200,10 +200,10 @@ void NGLScene::paintGL()
   MVP= M*m_cam.getVPMatrix();
   normalMatrix=MV;
   normalMatrix.inverse();
-  shader->setShaderParamFromMat4("MV",MV);
-  shader->setShaderParamFromMat4("MVP",MVP);
-  shader->setShaderParamFromMat3("normalMatrix",normalMatrix);
-  shader->setShaderParamFromMat4("M",M);
+  shader->setUniform("MV",MV);
+  shader->setUniform("MVP",MVP);
+  shader->setUniform("normalMatrix",normalMatrix);
+  shader->setUniform("M",M);
 
 
   m_vao->bind();

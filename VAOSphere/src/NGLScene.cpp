@@ -217,7 +217,7 @@ void NGLScene::paintGL()
 	ngl::Mat4 MVP;
 	MVP=m_mouseGlobalTX*m_cam.getVPMatrix();
 
-	shader->setShaderParamFromMat4("MVP",MVP);
+	shader->setUniform("MVP",MVP);
 
 	// now we bind back our vertex array object and draw
   m_vao->bind();

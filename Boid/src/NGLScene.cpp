@@ -20,7 +20,6 @@ NGLScene::NGLScene()
 NGLScene::~NGLScene()
 {
   std::cout<<"Shutting down NGL, removing VAO's and Shaders\n";
-  m_vao->removeVOA();
 }
 
 
@@ -61,7 +60,7 @@ void NGLScene::initializeGL()
 	// grab an instance of shader manager
 	ngl::ShaderLib *shader=ngl::ShaderLib::instance();
 	shader->use("nglColourShader");
-	shader->setRegisteredUniform4f("Colour",1,1,1,1);
+  shader->setUniform("Colour",1.0f,1.0f,1.0f,1.0f);
 	buildVAO();
 	glViewport(0,0,width(),height());
 }
@@ -85,23 +84,22 @@ void NGLScene::buildVAO()
     ngl::Vec3(0.5,0,1)
   }};
   std::cout<<"sizeof(verts) "<<sizeof(verts)<<" sizeof(ngl::Vec3) "<<sizeof(ngl::Vec3)<<"\n";
+  std::cout<<"sizeof(verts) "<<sizeof(verts)<<" sizeof(ngl::Vec3) "<<sizeof(ngl::Vec3)<<"\n";
   // create a vao as a series of GL_TRIANGLES
-  m_vao.reset( ngl::VertexArrayObject::createVOA(GL_TRIANGLES));
+  m_vao.reset(ngl::VAOFactory::createVAO(ngl::simpleVAO,GL_TRIANGLES) );
   m_vao->bind();
 
-   // in this case we are going to set our data as the vertices above
+  // in this case we are going to set our data as the vertices above
+  m_vao->setData(ngl::SimpleVAO::VertexData(verts.size()*sizeof(ngl::Vec3),verts[0].m_x));
+  // now we set the attribute pointer to be 0 (as this matches vertIn in our shader)
 
-   m_vao->setData(sizeof(verts),verts[0].m_x);
-   // now we set the attribute pointer to be 0 (as this matches vertIn in our shader)
+  m_vao->setVertexAttributePointer(0,3,GL_FLOAT,0,0);
 
-   m_vao->setVertexAttributePointer(0,3,GL_FLOAT,0,0);
-
-
-   m_vao->setNumIndices(verts.size());
+  // divide by 2 as we have both verts and normals
+  m_vao->setNumIndices(verts.size());
 
  // now unbind
   m_vao->unbind();
-
 }
 
 
@@ -131,18 +129,18 @@ void NGLScene::paintGL()
   ngl::Mat4 MVP;
   MVP=m_mouseGlobalTX*m_cam.getVPMatrix();
 
-  shader->setShaderParamFromMat4("MVP",MVP);
+  shader->setUniform("MVP",MVP);
 
 
   m_vao->bind();
-  shader->setShaderParamFromMat4("MVP",MVP);
+  shader->setUniform("MVP",MVP);
   m_vao->draw();
 
 //  ngl::Mat4 tx;
 //  tx.translate(0,2,0);
 //  MVP=m_mouseGlobalTX*m_cam.getVPMatrix()*tx;
 
-//  shader->setShaderParamFromMat4("MVP",MVP);
+//  shader->setUniform("MVP",MVP);
 //  m_vao->draw();
 
 
