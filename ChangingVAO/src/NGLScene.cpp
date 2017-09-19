@@ -24,7 +24,6 @@ NGLScene::NGLScene()
 NGLScene::~NGLScene()
 {
   std::cout<<"Shutting down NGL, removing VAO's and Shaders\n";
-
 }
 
 void NGLScene::resizeGL( int _w, int _h )
