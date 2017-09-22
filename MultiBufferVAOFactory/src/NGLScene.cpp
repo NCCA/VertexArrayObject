@@ -196,8 +196,8 @@ void NGLScene::paintGL()
   ngl::Mat3 normalMatrix;
   ngl::Mat4 M;
   M=m_mouseGlobalTX;
-  MV=  M*m_cam.getViewMatrix();
-  MVP= M*m_cam.getVPMatrix();
+  MV=  m_cam.getViewMatrix()*M;
+  MVP= m_cam.getVPMatrix()*M;
   normalMatrix=MV;
   normalMatrix.inverse();
   shader->setUniform("MV",MV);

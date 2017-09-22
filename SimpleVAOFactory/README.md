@@ -1,4 +1,4 @@
-#Boid
+# Boid
 This demo shows how to create a simple Boid shaped object using the built in SimpleVAO from the VAOFactory
 
 In this case we use the ngl built in SimpleVAO which takes one buffer of data and loads it into the VAO.

@@ -188,14 +188,14 @@ void NGLScene::paintGL()
   ngl::Transformation t;
 
   t.setPosition(-1.2f,0.0f,0.0f);
-  ngl::Mat4 MVP= m_mouseGlobalTX*t.getMatrix()*m_cam.getVPMatrix();
+  ngl::Mat4 MVP= m_cam.getVPMatrix()*t.getMatrix()*m_mouseGlobalTX;
   shader->setUniform("MVP",MVP);
 
   reinterpret_cast<MultiBufferIndexVAO *>( m_vao.get())->draw(0,m_index*3);
 
   t.setPosition(0.0f,0.0f,0.0f);
 
-   MVP= m_mouseGlobalTX*t.getMatrix()*m_cam.getVPMatrix();
+   MVP= m_cam.getVPMatrix()*t.getMatrix()*m_mouseGlobalTX;
   shader->setUniform("MVP",MVP);
 
   glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
@@ -203,7 +203,7 @@ void NGLScene::paintGL()
   m_vao->draw();
 
   t.setPosition(1.2f,0.0f,0.0f);
-  MVP= m_mouseGlobalTX*t.getMatrix()*m_cam.getVPMatrix();
+  MVP= m_cam.getVPMatrix()*t.getMatrix()*m_mouseGlobalTX;
   shader->setUniform("MVP",MVP);
 
   reinterpret_cast<MultiBufferIndexVAO *>( m_vao.get())->draw(m_index,3);

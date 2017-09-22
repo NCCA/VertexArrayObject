@@ -97,7 +97,7 @@ void NGLScene::paintGL()
   (*shader)["nglColourShader"]->use();
 
   ngl::Mat4 MVP;
-  MVP=m_mouseGlobalTX*m_cam.getVPMatrix();
+  MVP=m_cam.getVPMatrix()*m_mouseGlobalTX;
 
   shader->setUniform("MVP",MVP);
   m_vao->bind();
