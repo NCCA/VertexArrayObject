@@ -1,4 +1,4 @@
-#SimpleIndexVAO
+# SimpleIndexVAO
 This demo creates a simple Indexed VAO, the data is stored as
 
 Vec3 Vert -> Vec3 Colour in a simple std::array

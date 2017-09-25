@@ -1,4 +1,4 @@
-#Boid
+# Boid
 This demo shows how to create a simple Boid shaped object using the built in MultipleBufferVAO from the VAOFactory
 
 In this case we have to arrays, one of vec3 vertex values for the boids, the second is the normals,
