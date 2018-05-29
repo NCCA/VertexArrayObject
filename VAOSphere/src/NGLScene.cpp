@@ -42,7 +42,7 @@ void NGLScene::buildVAOSphere()
 	//  Sphere code based on a function Written by Paul Bourke.
 	//  http://astronomy.swin.edu.au/~pbourke/opengl/sphere/
 	// first we grab an instance of our VOA class as a TRIANGLE_STRIP
-  m_vao.reset (ngl::VAOFactory::createVAO(ngl::simpleVAO,GL_TRIANGLE_STRIP));
+  m_vao=ngl::VAOFactory::createVAO(ngl::simpleVAO,GL_TRIANGLE_STRIP);
 	// next we bind it so it's active for setting data
   m_vao->bind();
   // the next part of the code calculates the P,N,UV of the sphere for tri_strips

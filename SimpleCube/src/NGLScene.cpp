@@ -50,14 +50,14 @@ void NGLScene::initializeGL()
 	// Now we will create a basic Camera from the graphics library
 	// This is a static camera so it only needs to be set once
 	// First create Values for the camera position
-	ngl::Vec3 from(0,1,4);
+  ngl::Vec3 from(2,2,2);
 	ngl::Vec3 to(0,0,0);
 	ngl::Vec3 up(0,1,0);
 
 	m_cam.set(from,to,up);
 	// set the shape using FOV 45 Aspect Ratio based on Width and Height
 	// The final two are near and far clipping planes of 0.5 and 10
-  m_cam.setShape(45,720.0f/576.0f,0.001f,150);
+  m_cam.setShape(45,720.0f/576.0f,0.001f,150.0f);
 
   // now to load the shader and set the values
 	// grab an instance of shader manager
@@ -88,7 +88,7 @@ void NGLScene::initializeGL()
 void NGLScene::buildVAO()
 {
   // create a vao as a series of GL_TRIANGLES
-  m_vao.reset( ngl::VAOFactory::createVAO("simpleIndexVAO",GL_TRIANGLES));
+  m_vao= ngl::VAOFactory::createVAO(ngl::simpleIndexVAO,GL_TRIANGLES);
   m_vao->bind();
 
 
@@ -165,7 +165,6 @@ void NGLScene::paintGL()
   MVP=m_cam.getVPMatrix()*m_mouseGlobalTX;
 
   shader->setUniform("MVP",MVP);
-
 
   m_vao->bind();
   m_vao->draw();

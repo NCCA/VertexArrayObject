@@ -68,8 +68,11 @@ void NGLScene::initializeGL()
 	m_text.reset(new  ngl::Text(QFont("Arial",18)));
 	m_text->setScreenSize(width(),height());
 	// create the VAO but don't populate
-  m_vao.reset( ngl::VAOFactory::createVAO(ngl::simpleVAO,GL_LINES));
+  m_vao= ngl::VAOFactory::createVAO(ngl::simpleVAO,GL_LINES);
+  GLfloat smooth[2];
 
+  glGetFloatv(GL_SMOOTH_LINE_WIDTH_RANGE, &smooth[0]);
+  std::cout<<"Width "<<smooth[0]<<" "<<smooth[1]<<'\n';
 }
 
 
@@ -105,6 +108,7 @@ void NGLScene::paintGL()
   // We must do this each time as we change the data.
   m_vao->setVertexAttributePointer(0,3,GL_FLOAT,0,0);
   m_vao->setNumIndices(m_data.size());
+  glLineWidth(1.0f);
   m_vao->draw();
   m_vao->unbind();
 

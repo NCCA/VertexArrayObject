@@ -116,7 +116,7 @@ void NGLScene::buildVAO()
     8,10,3,9,11,0}
   };
   // create a vao as a series of GL_TRIANGLES
-  m_vao.reset(ngl::VAOFactory::createVAO(ngl::simpleIndexVAO,GL_TRIANGLES) );
+  m_vao=ngl::VAOFactory::createVAO(ngl::simpleIndexVAO,GL_TRIANGLES);
   m_vao->bind();
 
   // in this case we are going to set our data as the vertices above

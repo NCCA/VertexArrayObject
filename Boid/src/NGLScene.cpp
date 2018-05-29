@@ -86,7 +86,7 @@ void NGLScene::buildVAO()
   std::cout<<"sizeof(verts) "<<sizeof(verts)<<" sizeof(ngl::Vec3) "<<sizeof(ngl::Vec3)<<"\n";
   std::cout<<"sizeof(verts) "<<sizeof(verts)<<" sizeof(ngl::Vec3) "<<sizeof(ngl::Vec3)<<"\n";
   // create a vao as a series of GL_TRIANGLES
-  m_vao.reset(ngl::VAOFactory::createVAO(ngl::simpleVAO,GL_TRIANGLES) );
+  m_vao=ngl::VAOFactory::createVAO(ngl::simpleVAO,GL_TRIANGLES) ;
   m_vao->bind();
 
   // in this case we are going to set our data as the vertices above

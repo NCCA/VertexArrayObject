@@ -68,7 +68,7 @@ private:
     //----------------------------------------------------------------------------------------------------------------------
     /// @brief a simple light use to illuminate the screen
     //----------------------------------------------------------------------------------------------------------------------
-    std::unique_ptr<MultiBufferIndexVAO> m_vao;
+    std::unique_ptr<ngl::AbstractVAO> m_vao;
     //----------------------------------------------------------------------------------------------------------------------
     /// @brief Qt Event called when a key is pressed
     /// @param [in] _event the Qt event to query for size etc
