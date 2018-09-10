@@ -2,15 +2,13 @@
 #include <QGuiApplication>
 
 #include "NGLScene.h"
-#include <ngl/Camera.h>
-#include <ngl/Light.h>
 #include <ngl/Transformation.h>
 #include <ngl/Texture.h>
 #include <ngl/NGLInit.h>
 #include <ngl/ShaderLib.h>
 #include <ngl/VAOFactory.h>
 #include <ngl/SimpleVAO.h>
-#include  <cstddef>
+//#include  <cstddef>
 
 NGLScene::NGLScene()
 {
@@ -42,7 +40,7 @@ void NGLScene::buildVAOSphere()
 	//  Sphere code based on a function Written by Paul Bourke.
 	//  http://astronomy.swin.edu.au/~pbourke/opengl/sphere/
 	// first we grab an instance of our VOA class as a TRIANGLE_STRIP
-  m_vao.reset (ngl::VAOFactory::createVAO(ngl::simpleVAO,GL_TRIANGLE_STRIP));
+  m_vao=ngl::VAOFactory::createVAO(ngl::simpleVAO,GL_TRIANGLE_STRIP);
 	// next we bind it so it's active for setting data
   m_vao->bind();
   // the next part of the code calculates the P,N,UV of the sphere for tri_strips
@@ -135,7 +133,7 @@ void NGLScene::buildVAOSphere()
 
 void NGLScene::resizeGL( int _w, int _h )
 {
-  m_cam.setShape( 45.0f, static_cast<float>( _w ) / _h, 0.05f, 350.0f );
+  m_project=ngl::perspective( 45.0f, static_cast<float>( _w ) / _h, 0.05f, 350.0f );
   m_win.width  = static_cast<int>( _w * devicePixelRatio() );
   m_win.height = static_cast<int>( _h * devicePixelRatio() );
 }
@@ -153,14 +151,14 @@ void NGLScene::initializeGL()
   // Now we will create a basic Camera from the graphics library
   // This is a static camera so it only needs to be set once
   // First create Values for the camera position
-  ngl::Vec3 from(0,1,2);
+  ngl::Vec3 from(0,1,3);
   ngl::Vec3 to(0,0,0);
   ngl::Vec3 up(0,1,0);
 
-	m_cam.set(from,to,up);
+  m_view=ngl::lookAt(from,to,up);
 	// set the shape using FOV 45 Aspect Ratio based on Width and Height
 	// The final two are near and far clipping planes of 0.5 and 10
-	m_cam.setShape(45,(float)720.0/576.0,0.001,150);
+  m_project=ngl::perspective(45,(float)720.0/576.0,0.001,150);
 	// now to load the shader and set the values
 	// grab an instance of shader manager
 	ngl::ShaderLib *shader=ngl::ShaderLib::instance();
@@ -215,7 +213,7 @@ void NGLScene::paintGL()
 	ngl::ShaderLib *shader=ngl::ShaderLib::instance();
 	(*shader)["TextureShader"]->use();
 	ngl::Mat4 MVP;
-  MVP=m_cam.getVPMatrix()*m_mouseGlobalTX;
+  MVP=m_project*m_view*m_mouseGlobalTX;
 
 	shader->setUniform("MVP",MVP);
 

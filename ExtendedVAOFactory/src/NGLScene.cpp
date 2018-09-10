@@ -2,9 +2,7 @@
 #include <QGuiApplication>
 
 #include "NGLScene.h"
-#include <ngl/Camera.h>
 #include <ngl/Transformation.h>
-#include <ngl/Material.h>
 #include <ngl/NGLInit.h>
 #include <ngl/VAOPrimitives.h>
 #include <ngl/ShaderLib.h>
@@ -28,7 +26,7 @@ NGLScene::~NGLScene()
 
 void NGLScene::resizeGL( int _w, int _h )
 {
-  m_cam.setShape( 45.0f, static_cast<float>( _w ) / _h, 0.05f, 350.0f );
+  m_project=ngl::perspective( 45.0f, static_cast<float>( _w ) / _h, 0.05f, 350.0f );
   m_win.width  = static_cast<int>( _w * devicePixelRatio() );
   m_win.height = static_cast<int>( _h * devicePixelRatio() );
 }
@@ -48,14 +46,14 @@ void NGLScene::initializeGL()
   // Now we will create a basic Camera from the graphics library
   // This is a static camera so it only needs to be set once
   // First create Values for the camera position
-  ngl::Vec3 from(0,1,2);
+  ngl::Vec3 from(0,1,3);
   ngl::Vec3 to(0,0,0);
   ngl::Vec3 up(0,1,0);
 
-  m_cam.set(from,to,up);
+  m_view=ngl::lookAt(from,to,up);
   // set the shape using FOV 45 Aspect Ratio based on Width and Height
   // The final two are near and far clipping planes of 0.5 and 10
-  m_cam.setShape(45,720.0f/576.0f,0.001f,150.0f);
+  m_project=ngl::perspective(45.0f,1024.0f/720.0f,0.001f,150.0f);
 
   // now to load the shader and set the values
   // grab an instance of shader manager
@@ -138,7 +136,7 @@ void NGLScene::buildVAO()
     8,10, 3,9,11, 0}
   };
   // create a vao as a series of GL_TRIANGLES
-  m_vao.reset(static_cast<MultiBufferIndexVAO *>( ngl::VAOFactory::createVAO("multiBufferIndexVAO",GL_TRIANGLES)) );
+  m_vao= ngl::VAOFactory::createVAO("multiBufferIndexVAO",GL_TRIANGLES);
   m_vao->bind();
 
   // in this case we are going to set our data as the vertices above
@@ -149,7 +147,7 @@ void NGLScene::buildVAO()
 
   m_vao->setVertexAttributePointer(1,3,GL_FLOAT,0,3);
   // as we are storing the abstract we need to get the concrete here to call setIndices, do a quick cast
-  m_vao->setIndices(sizeof(indices),&indices[0], GL_UNSIGNED_SHORT);
+  reinterpret_cast<MultiBufferIndexVAO *>( m_vao.get())->setIndices(sizeof(indices),&indices[0], GL_UNSIGNED_SHORT);
   // data is 24 bytes apart ( two Vec3's) first index
   // is 0 second is 3 floats into the data set (i.e. vec3 offset)
   m_vao->setNumIndices(indices.size());
@@ -188,14 +186,14 @@ void NGLScene::paintGL()
   ngl::Transformation t;
 
   t.setPosition(-1.2f,0.0f,0.0f);
-  ngl::Mat4 MVP= m_cam.getVPMatrix()*t.getMatrix()*m_mouseGlobalTX;
+  ngl::Mat4 MVP= m_project*m_view*t.getMatrix()*m_mouseGlobalTX;
   shader->setUniform("MVP",MVP);
 
   reinterpret_cast<MultiBufferIndexVAO *>( m_vao.get())->draw(0,m_index*3);
 
   t.setPosition(0.0f,0.0f,0.0f);
 
-   MVP= m_cam.getVPMatrix()*t.getMatrix()*m_mouseGlobalTX;
+   MVP= m_project*m_view*t.getMatrix()*m_mouseGlobalTX;
   shader->setUniform("MVP",MVP);
 
   glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
@@ -203,7 +201,7 @@ void NGLScene::paintGL()
   m_vao->draw();
 
   t.setPosition(1.2f,0.0f,0.0f);
-  MVP= m_cam.getVPMatrix()*t.getMatrix()*m_mouseGlobalTX;
+  MVP= m_project*m_view*t.getMatrix()*m_mouseGlobalTX;
   shader->setUniform("MVP",MVP);
 
   reinterpret_cast<MultiBufferIndexVAO *>( m_vao.get())->draw(m_index,3);

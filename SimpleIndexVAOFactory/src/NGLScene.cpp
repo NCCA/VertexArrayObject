@@ -2,9 +2,7 @@
 #include <QGuiApplication>
 
 #include "NGLScene.h"
-#include <ngl/Camera.h>
 #include <ngl/Transformation.h>
-#include <ngl/Material.h>
 #include <ngl/NGLInit.h>
 #include <ngl/VAOPrimitives.h>
 #include <ngl/ShaderLib.h>
@@ -28,7 +26,7 @@ NGLScene::~NGLScene()
 
 void NGLScene::resizeGL( int _w, int _h )
 {
-  m_cam.setShape( 45.0f, static_cast<float>( _w ) / _h, 0.05f, 350.0f );
+  m_project=ngl::perspective( 45.0f, static_cast<float>( _w ) / _h, 0.05f, 350.0f );
   m_win.width  = static_cast<int>( _w * devicePixelRatio() );
   m_win.height = static_cast<int>( _h * devicePixelRatio() );
 }
@@ -54,10 +52,10 @@ void NGLScene::initializeGL()
   ngl::Vec3 to(0,0,0);
   ngl::Vec3 up(0,1,0);
 
-  m_cam.set(from,to,up);
+  m_view=ngl::lookAt(from,to,up);
   // set the shape using FOV 45 Aspect Ratio based on Width and Height
   // The final two are near and far clipping planes of 0.5 and 10
-  m_cam.setShape(45,720.0f/576.0f,0.001f,150.0f);
+  m_project=ngl::perspective(45,720.0f/576.0f,0.001f,150.0f);
 
   // now to load the shader and set the values
   // grab an instance of shader manager
@@ -116,7 +114,7 @@ void NGLScene::buildVAO()
     8,10,3,9,11,0}
   };
   // create a vao as a series of GL_TRIANGLES
-  m_vao.reset(ngl::VAOFactory::createVAO(ngl::simpleIndexVAO,GL_TRIANGLES) );
+  m_vao=ngl::VAOFactory::createVAO(ngl::simpleIndexVAO,GL_TRIANGLES);
   m_vao->bind();
 
   // in this case we are going to set our data as the vertices above
@@ -163,7 +161,7 @@ void NGLScene::paintGL()
   (*shader)["ColourShader"]->use();
 
 
-  ngl::Mat4 MVP= m_cam.getVPMatrix()*m_mouseGlobalTX;
+  ngl::Mat4 MVP= m_project*m_view*m_mouseGlobalTX;
   shader->setUniform("MVP",MVP);
 
   m_vao->bind();

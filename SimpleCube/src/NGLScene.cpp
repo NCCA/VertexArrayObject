@@ -2,9 +2,6 @@
 #include <QGuiApplication>
 
 #include "NGLScene.h"
-#include <ngl/Camera.h>
-#include <ngl/Light.h>
-#include <ngl/Material.h>
 #include <ngl/NGLInit.h>
 #include <ngl/VAOPrimitives.h>
 #include <ngl/ShaderLib.h>
@@ -29,11 +26,12 @@ NGLScene::~NGLScene()
 
 void NGLScene::resizeGL( int _w, int _h )
 {
-  m_cam.setShape( 45.0f, static_cast<float>( _w ) / _h, 0.05f, 350.0f );
+  m_project=ngl::perspective( 45.0f, static_cast<float>( _w ) / _h, 0.05f, 350.0f );
   m_win.width  = static_cast<int>( _w * devicePixelRatio() );
   m_win.height = static_cast<int>( _h * devicePixelRatio() );
 }
 
+constexpr auto ColourShader="ColourShader";
 
 void NGLScene::initializeGL()
 {
@@ -50,23 +48,22 @@ void NGLScene::initializeGL()
 	// Now we will create a basic Camera from the graphics library
 	// This is a static camera so it only needs to be set once
 	// First create Values for the camera position
-	ngl::Vec3 from(0,1,4);
+  ngl::Vec3 from(0,1,4);
 	ngl::Vec3 to(0,0,0);
 	ngl::Vec3 up(0,1,0);
 
-	m_cam.set(from,to,up);
+  m_view=ngl::lookAt(from,to,up);
 	// set the shape using FOV 45 Aspect Ratio based on Width and Height
 	// The final two are near and far clipping planes of 0.5 and 10
-  m_cam.setShape(45,720.0f/576.0f,0.001f,150);
+  m_project=ngl::perspective(45,720.0f/576.0f,0.001f,150);
 
   // now to load the shader and set the values
 	// grab an instance of shader manager
 	ngl::ShaderLib *shader=ngl::ShaderLib::instance();
 	// load a frag and vert shaders
-  constexpr auto ColourShader="ColourShader";
   constexpr auto ColourVertex="ColourVertex";
   constexpr auto ColourFragment="ColourFragment";
-	shader->createShaderProgram("ColourShader");
+  shader->createShaderProgram(ColourShader);
 
   shader->attachShader(ColourVertex,ngl::ShaderType::VERTEX);
   shader->attachShader(ColourFragment,ngl::ShaderType::FRAGMENT);
@@ -88,7 +85,7 @@ void NGLScene::initializeGL()
 void NGLScene::buildVAO()
 {
   // create a vao as a series of GL_TRIANGLES
-  m_vao.reset( ngl::VAOFactory::createVAO("simpleIndexVAO",GL_TRIANGLES));
+  m_vao=ngl::VAOFactory::createVAO(ngl::simpleIndexVAO,GL_TRIANGLES);
   m_vao->bind();
 
 
@@ -101,34 +98,23 @@ void NGLScene::buildVAO()
                                       1,5,2,2,6,5
                                    };
 
-   GLfloat vertices[] = {-1,1,-1,
-                         1,1,-1,
-                         1,1,1,
-                         -1,1,1,
-                         -1,-1,-1,
-                         1,-1,-1,
-                         1,-1,1,
-                         -1,-1,1
+   GLfloat vertcolour[] = {-1,1,-1,  1,0,0,
+                         1,1,-1,  0,1,0,
+                         1,1,1,  0,0,1,
+                         -1,1,1,  1,1,1,
+                         -1,-1,-1,  0,0,1,
+                         1,-1,-1,  0,1,0,
+                         1,-1,1,   1,0,0,
+                         -1,-1,1 , 1,1,1
                         };
 
-   GLfloat colours[]={
-                        1,0,0,
-                        0,1,0,
-                        0,0,1,
-                        1,1,1,
-                        0,0,1,
-                        0,1,0,
-                        1,0,0,
-                        1,1,1
-                      };
+
    // in this case we are going to set our data as the vertices above
 
-   m_vao->setData(ngl::SimpleIndexVAO::VertexData( 24*sizeof(GLfloat),vertices[0],sizeof(indices),&indices[0],GL_UNSIGNED_BYTE,GL_STATIC_DRAW));
+   m_vao->setData(ngl::SimpleIndexVAO::VertexData( 48*sizeof(GLfloat),vertcolour[0],sizeof(indices),&indices[0],GL_UNSIGNED_BYTE,GL_STATIC_DRAW));
    // now we set the attribute pointer to be 0 (as this matches vertIn in our shader)
-   m_vao->setVertexAttributePointer(0,3,GL_FLOAT,0,0);
-   m_vao->setData(ngl::SimpleIndexVAO::VertexData(24*sizeof(GLfloat),colours[0],sizeof(indices),&indices[0],GL_UNSIGNED_BYTE,GL_STATIC_DRAW));
-   // now we set the attribute pointer to be 0 (as this matches vertIn in our shader)
-   m_vao->setVertexAttributePointer(1,3,GL_FLOAT,0,0);
+   m_vao->setVertexAttributePointer(0,3,GL_FLOAT,sizeof(ngl::Vec3)*2,0);
+   m_vao->setVertexAttributePointer(1,3,GL_FLOAT,sizeof(ngl::Vec3)*2,sizeof(ngl::Vec3));
    m_vao->setNumIndices(sizeof(indices));
  // now unbind
   m_vao->unbind();
@@ -159,14 +145,11 @@ void NGLScene::paintGL()
   m_mouseGlobalTX.m_m[3][2] = m_modelPos.m_z;
 
   ngl::ShaderLib *shader=ngl::ShaderLib::instance();
-  (*shader)["ColourShader"]->use();
+  (*shader)[ColourShader]->use();
 
   ngl::Mat4 MVP;
-  MVP=m_cam.getVPMatrix()*m_mouseGlobalTX;
-
+  MVP=m_project*m_view*m_mouseGlobalTX;
   shader->setUniform("MVP",MVP);
-
-
   m_vao->bind();
   m_vao->draw();
   m_vao->unbind();

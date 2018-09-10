@@ -2,10 +2,7 @@
 #include <QGuiApplication>
 
 #include "NGLScene.h"
-#include <ngl/Camera.h>
-#include <ngl/Light.h>
 #include <ngl/Transformation.h>
-#include <ngl/Material.h>
 #include <ngl/NGLInit.h>
 #include <ngl/VAOPrimitives.h>
 #include <ngl/ShaderLib.h>
@@ -27,7 +24,7 @@ NGLScene::~NGLScene()
 
 void NGLScene::resizeGL( int _w, int _h )
 {
-  m_cam.setShape( 45.0f, static_cast<float>( _w ) / _h, 0.05f, 350.0f );
+  m_project=ngl::perspective( 45.0f, static_cast<float>( _w ) / _h, 0.05f, 350.0f );
   m_win.width  = static_cast<int>( _w * devicePixelRatio() );
   m_win.height = static_cast<int>( _h * devicePixelRatio() );
 }
@@ -47,14 +44,14 @@ void NGLScene::initializeGL()
   // Now we will create a basic Camera from the graphics library
   // This is a static camera so it only needs to be set once
   // First create Values for the camera position
-  ngl::Vec3 from(0,1,2);
+  ngl::Vec3 from(0,1,-3);
   ngl::Vec3 to(0,0,0);
   ngl::Vec3 up(0,1,0);
 
-  m_cam.set(from,to,up);
+  m_view=ngl::lookAt(from,to,up);
   // set the shape using FOV 45 Aspect Ratio based on Width and Height
   // The final two are near and far clipping planes of 0.5 and 10
-  m_cam.setShape(45,720.0f/576.0f,0.001f,150);
+  m_project=ngl::perspective(45,720.0f/576.0f,0.001f,150);
 
   // now to load the shader and set the values
   // grab an instance of shader manager
@@ -84,21 +81,17 @@ void NGLScene::initializeGL()
   shader->linkProgramObject( shaderProgram );
   // and make it active ready to load values
   ( *shader )[ shaderProgram ]->use();
-  // the shader will use the currently active material and light0 so set them
-  ngl::Material m( ngl::STDMAT::GOLD );
-  // load our material values to the shader into the structure material (see Vertex shader)
-  m.loadToShader( "material" );
-  shader->setUniform("viewerPos",m_cam.getEye().toVec3());
-  // now create our light this is done after the camera so we can pass the
-  // transpose of the projection matrix to the light to do correct eye space
-  // transformations
-  ngl::Mat4 iv=m_cam.getViewMatrix();
-  iv.transpose();
-  iv=iv.inverse();
-  ngl::Light l(ngl::Vec3(0,1,0),ngl::Colour(1,1,1,1),ngl::Colour(1,1,1,1),ngl::LightModes::POINTLIGHT);
-  l.setTransform(iv);
-  // load these values to the shader as well
-  l.loadToShader("light");
+  ngl::Vec4 lightPos(-2.0f,5.0f,2.0f,0.0f);
+  shader->setUniform("light.position",lightPos);
+  shader->setUniform("light.ambient",0.0f,0.0f,0.0f,1.0f);
+  shader->setUniform("light.diffuse",1.0f,1.0f,1.0f,1.0f);
+  shader->setUniform("light.specular",0.8f,0.8f,0.8f,1.0f);
+  // gold like phong material
+  shader->setUniform("material.ambient",0.274725f,0.1995f,0.0745f,0.0f);
+  shader->setUniform("material.diffuse",0.75164f,0.60648f,0.22648f,0.0f);
+  shader->setUniform("material.specular",0.628281f,0.555802f,0.3666065f,0.0f);
+  shader->setUniform("material.shininess",51.2f);
+  shader->setUniform("viewerPos",from);
 
   buildVAO();
   ngl::VAOFactory::listCreators();
@@ -146,7 +139,7 @@ void NGLScene::buildVAO()
 
   std::cout<<"sizeof(verts) "<<sizeof(verts)<<" sizeof(ngl::Vec3) "<<sizeof(ngl::Vec3)<<"\n";
   // create a vao as a series of GL_TRIANGLES
-  m_vao.reset(ngl::VAOFactory::createVAO(ngl::multiBufferVAO,GL_TRIANGLES) );
+  m_vao=ngl::VAOFactory::createVAO(ngl::multiBufferVAO,GL_TRIANGLES);
 
   m_vao->bind();
 
@@ -158,7 +151,7 @@ void NGLScene::buildVAO()
   // 2nd buffer with normals
   m_vao->setData(ngl::MultiBufferVAO::VertexData(sizeof(verts),normals[0].m_x));
   // now we set the attribute pointer to be 2 (as this matches normal in our shader)
-  m_vao->setVertexAttributePointer(2,3,GL_FLOAT,0,0);
+  m_vao->setVertexAttributePointer(1,3,GL_FLOAT,0,0);
 
   m_vao->setNumIndices(verts.size());
 
@@ -196,15 +189,14 @@ void NGLScene::paintGL()
   ngl::Mat3 normalMatrix;
   ngl::Mat4 M;
   M=m_mouseGlobalTX;
-  MV=  m_cam.getViewMatrix()*M;
-  MVP= m_cam.getVPMatrix()*M;
+  MV=  m_view*M;
+  MVP= m_project*MV;
   normalMatrix=MV;
   normalMatrix.inverse();
   shader->setUniform("MV",MV);
   shader->setUniform("MVP",MVP);
   shader->setUniform("normalMatrix",normalMatrix);
   shader->setUniform("M",M);
-
 
   m_vao->bind();
   m_vao->draw();

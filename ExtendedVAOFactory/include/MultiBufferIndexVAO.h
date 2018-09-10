@@ -13,7 +13,7 @@ class  MultiBufferIndexVAO : public ngl::AbstractVAO
     /// @param _mode the mode to draw with.
     /// @returns a new AbstractVAO * object
     //----------------------------------------------------------------------------------------------------------------------
-    static ngl::AbstractVAO *create(GLenum _mode=GL_TRIANGLES) { return new MultiBufferIndexVAO(_mode); }
+    static std::unique_ptr<ngl::AbstractVAO>create(GLenum _mode=GL_TRIANGLES) { return std::unique_ptr<AbstractVAO>(new MultiBufferIndexVAO(_mode)); }
     //----------------------------------------------------------------------------------------------------------------------
     /// @brief draw the VAO using glDrawArrays
     //----------------------------------------------------------------------------------------------------------------------
@@ -49,7 +49,7 @@ class  MultiBufferIndexVAO : public ngl::AbstractVAO
      GLuint getBufferID(unsigned int ){return m_buffer;}
      // no need to implement this for the demo but if you need to
      // modify the buffer do so
-     ngl::Real * mapBuffer(unsigned int , GLenum ){}
+     ngl::Real * mapBuffer(unsigned int , GLenum ){ return nullptr;}
 
 
   protected :

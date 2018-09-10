@@ -8,9 +8,9 @@ out vec3 fragmentNormal;
 /// @brief the vertex passed in
 layout(location =0)in vec3 inVert;
 /// @brief the normal passed in
-layout(location =2)in vec3 inNormal;
+layout(location =1)in vec3 inNormal;
 /// @brief the in uv
-layout(location =1)in vec2 inUV;
+layout(location =2)in vec2 inUV;
 
 struct Materials
 {
@@ -27,10 +27,6 @@ struct Lights
 	vec4 ambient;
 	vec4 diffuse;
 	vec4 specular;
-	float constantAttenuation;
-	float spotCosCutoff;
-	float quadraticAttenuation;
-	float linearAttenuation;
 };
 // our material
 uniform Materials material;

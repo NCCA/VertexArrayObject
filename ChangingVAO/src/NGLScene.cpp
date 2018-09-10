@@ -2,10 +2,7 @@
 #include <QGuiApplication>
 
 #include "NGLScene.h"
-#include <ngl/Camera.h>
-#include <ngl/Light.h>
 #include <ngl/Transformation.h>
-#include <ngl/Material.h>
 #include <ngl/NGLInit.h>
 #include <ngl/SimpleVAO.h>
 #include <ngl/VAOPrimitives.h>
@@ -28,7 +25,7 @@ NGLScene::~NGLScene()
 
 void NGLScene::resizeGL( int _w, int _h )
 {
-  m_cam.setShape( 45.0f, static_cast<float>( _w ) / _h, 0.05f, 350.0f );
+  m_project=ngl::perspective( 45.0f, static_cast<float>( _w ) / _h, 0.05f, 350.0f );
   m_win.width  = static_cast<int>( _w * devicePixelRatio() );
   m_win.height = static_cast<int>( _h * devicePixelRatio() );
 }
@@ -52,10 +49,10 @@ void NGLScene::initializeGL()
 	ngl::Vec3 to(0,0,0);
 	ngl::Vec3 up(0,1,0);
 
-	m_cam.set(from,to,up);
+  m_view=ngl::lookAt(from,to,up);
 	// set the shape using FOV 45 Aspect Ratio based on Width and Height
 	// The final two are near and far clipping planes of 0.5 and 10
-  m_cam.setShape(45,720.0f/576.0f,0.001f,150);
+  m_project=ngl::perspective(45,1024.0f/720.0f,0.001f,150);
 
 // now to load the shader and set the values
 	// grab an instance of shader manager
@@ -68,7 +65,7 @@ void NGLScene::initializeGL()
 	m_text.reset(new  ngl::Text(QFont("Arial",18)));
 	m_text->setScreenSize(width(),height());
 	// create the VAO but don't populate
-  m_vao.reset( ngl::VAOFactory::createVAO(ngl::simpleVAO,GL_LINES));
+  m_vao=ngl::VAOFactory::createVAO(ngl::simpleVAO,GL_LINES);
 
 }
 
@@ -97,7 +94,7 @@ void NGLScene::paintGL()
   (*shader)["nglColourShader"]->use();
 
   ngl::Mat4 MVP;
-  MVP=m_cam.getVPMatrix()*m_mouseGlobalTX;
+  MVP=m_project*m_view*m_mouseGlobalTX;
 
   shader->setUniform("MVP",MVP);
   m_vao->bind();
@@ -108,7 +105,7 @@ void NGLScene::paintGL()
   m_vao->draw();
   m_vao->unbind();
 
-  m_text->setColour(ngl::Colour(1,1,1));
+  m_text->setColour(1.0f,1.0f,1.0f);
   QString text=QString("Data Size %1 ").arg(m_data.size());
   m_text->renderText(10,18,text );
 
