@@ -91,6 +91,7 @@ void NGLScene::initializeGL()
 }
 
 
+
 void NGLScene::buildVAO()
 {
   // data from here http://rbwhitaker.wikidot.com/index-and-vertex-buffers
@@ -135,8 +136,11 @@ void NGLScene::buildVAO()
     5, 8, 3,5, 9, 4,6,10, 1,6,11, 7,7,10, 6,7,11, 2,
     8,10, 3,9,11, 0}
   };
+
+
   // create a vao as a series of GL_TRIANGLES
-  m_vao= ngl::VAOFactory::createVAO("multiBufferIndexVAO",GL_TRIANGLES);
+  // need to change this to be a MultiBufferIndexVAO and cast it from ngl::AbstractVAO see README.md for more details
+  m_vao=ngl::vaoFactoryCast<MultiBufferIndexVAO>(ngl::VAOFactory::createVAO("multiBufferIndexVAO",GL_TRIANGLES));
   m_vao->bind();
 
   // in this case we are going to set our data as the vertices above
@@ -147,7 +151,7 @@ void NGLScene::buildVAO()
 
   m_vao->setVertexAttributePointer(1,3,GL_FLOAT,0,3);
   // as we are storing the abstract we need to get the concrete here to call setIndices, do a quick cast
-  reinterpret_cast<MultiBufferIndexVAO *>( m_vao.get())->setIndices(sizeof(indices),&indices[0], GL_UNSIGNED_SHORT);
+  m_vao->setIndices(sizeof(indices),&indices[0], GL_UNSIGNED_SHORT);
   // data is 24 bytes apart ( two Vec3's) first index
   // is 0 second is 3 floats into the data set (i.e. vec3 offset)
   m_vao->setNumIndices(indices.size());
@@ -189,7 +193,7 @@ void NGLScene::paintGL()
   ngl::Mat4 MVP= m_project*m_view*t.getMatrix()*m_mouseGlobalTX;
   shader->setUniform("MVP",MVP);
 
-  reinterpret_cast<MultiBufferIndexVAO *>( m_vao.get())->draw(0,m_index*3);
+  m_vao->draw(0,m_index*3);
 
   t.setPosition(0.0f,0.0f,0.0f);
 
@@ -204,7 +208,7 @@ void NGLScene::paintGL()
   MVP= m_project*m_view*t.getMatrix()*m_mouseGlobalTX;
   shader->setUniform("MVP",MVP);
 
-  reinterpret_cast<MultiBufferIndexVAO *>( m_vao.get())->draw(m_index,3);
+  m_vao->draw(m_index,3);
   glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
   m_vao->draw();
 
