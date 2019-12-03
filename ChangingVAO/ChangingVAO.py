@@ -45,8 +45,8 @@ class MainWindow(QOpenGLWindow) :
     self.view=lookAt(Vec3(0,1,22),Vec3.zero(),Vec3.up())
     self.project=perspective( 45.0, 720.0 / 576.0, 0.05, 350.0 )
     self.vao=VAOFactory.createVAO('simpleVAO',GL_LINES)
-    #self.text=Text(QFont("Arial",18))
-    #self.text.setScreenSize(self.width,self.height);
+    self.text=Text("Arial",18)
+    self.text.setScreenSize(self.width,self.height);
 
     self.startTimer(0)
   
@@ -76,9 +76,9 @@ class MainWindow(QOpenGLWindow) :
       self.vao.draw();
       self.vao.unbind();
 
-      #self.text.setColour(Colour(1,1,1));
-      #text="Data Size %d " %(len(self.data)/2)
-      #self.text.renderText(10,18,text );
+      self.text.setColour(1,1,1);
+      text="Data Size %d " %(len(self.data)/2)
+      self.text.renderText(10,18,text );
 
     except OpenGL.error.GLError :
       print ('error')
