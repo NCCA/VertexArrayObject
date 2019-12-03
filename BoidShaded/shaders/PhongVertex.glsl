@@ -48,13 +48,9 @@ uniform mat4 M;
 void main()
 {
 // calculate the fragments surface normal
-fragmentNormal = (normalMatrix*inNormal);
+fragmentNormal =  (normalMatrix*inNormal);
 
 
-if (Normalize == true)
-{
- fragmentNormal = normalize(fragmentNormal);
-}
 // calculate the vertex position
 gl_Position = MVP*vec4(inVert,1.0);
 

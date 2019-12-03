@@ -7,6 +7,7 @@
 #include <ngl/VAOFactory.h>
 #include <ngl/SimpleVAO.h>
 #include <ngl/ShaderLib.h>
+#include <ngl/NGLStream.h>
 #include <array>
 
 
@@ -157,7 +158,8 @@ void NGLScene::buildVAO()
 
  // now unbind
   m_vao->unbind();
-
+  for(auto f : verts)
+    std::cout<<f<<'\n';
 
 }
 

@@ -68,18 +68,18 @@ void NGLScene::buildVAO()
 {
   std::array<ngl::Vec3,12> verts=
   {{
-    ngl::Vec3(0,1,1),
-    ngl::Vec3(0,0,-1),
-    ngl::Vec3(-0.5,0,1),
-    ngl::Vec3(0,1,1),
-    ngl::Vec3(0,0,-1),
-    ngl::Vec3(0.5,0,1),
-    ngl::Vec3(0,1,1),
-    ngl::Vec3(0,0,1.5),
-    ngl::Vec3(-0.5,0,1),
-    ngl::Vec3(0,1,1),
-    ngl::Vec3(0,0,1.5),
-    ngl::Vec3(0.5,0,1)
+    ngl::Vec3(0.0f,1.0f,1.0f),
+    ngl::Vec3(0.0f,0.0f,-1.0f),
+    ngl::Vec3(-0.5f,0.0f,1.0f),
+    ngl::Vec3(0.0f,1.0f,1.0f),
+    ngl::Vec3(0.0f,0.0f,-1.0f),
+    ngl::Vec3(0.5f,0.0f,1.0f),
+    ngl::Vec3(0.0f,1.0f,1.0f),
+    ngl::Vec3(0.0f,0.0f,1.5f),
+    ngl::Vec3(-0.5f,0.0f,1.0f),
+    ngl::Vec3(0.0f,1.0f,1.0f),
+    ngl::Vec3(0.0f,0.0f,1.5f),
+    ngl::Vec3(0.5f,0.0f,1.0f)
   }};
   std::cout<<"sizeof(verts) "<<sizeof(verts)<<" sizeof(ngl::Vec3) "<<sizeof(ngl::Vec3)<<"\n";
   std::cout<<"sizeof(verts) "<<sizeof(verts)<<" sizeof(ngl::Vec3) "<<sizeof(ngl::Vec3)<<"\n";

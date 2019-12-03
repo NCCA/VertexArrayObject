@@ -73,6 +73,6 @@ return ambient + diffuse + specular;
 
 void main ()
 {
-		fragColour=pointLight();
+  fragColour=pointLight();
 }
 
