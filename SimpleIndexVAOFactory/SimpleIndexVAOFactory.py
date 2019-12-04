@@ -14,7 +14,7 @@ class MainWindow(QOpenGLWindow) :
     self.mouseGlobalTX=Mat4()
     self.width=int(1024)
     self.height=int(720)
-    self.setTitle('Boid')
+    self.setTitle('SimpleIndexedVAO Python')
     self.spinXFace = int(0)
     self.spinYFace = int(0)
     self.rotate = False
@@ -37,71 +37,51 @@ class MainWindow(QOpenGLWindow) :
     glEnable( GL_DEPTH_TEST )
     glEnable( GL_MULTISAMPLE )
     shader=ShaderLib.instance()
-    shader.loadShader('Phong','shaders/PhongVertex.glsl','shaders/PhongFragment.glsl',ErrorExit.OFF)
-    shader.use('Phong')
-    lightPos=Vec4(-2.0,5.0,2.0,0.0)
-    shader.setUniform('light.position',lightPos)
-    shader.setUniform('light.ambient',0.0,0.0,0.0,1.0)
-    shader.setUniform('light.diffuse',1.0,1.0,1.0,1.0);
-    shader.setUniform('light.specular',0.8,0.8,0.8,1.0);
-    shader.setUniform('material.ambient',0.274725,0.1995,0.0745,0.0);
-    shader.setUniform('material.diffuse',0.75164,0.60648,0.22648,0.0);
-    shader.setUniform('material.specular',0.628281,0.555802,0.3666065,0.0);
-    shader.setUniform('material.shininess',51.2);
-    shader.setUniform('viewerPos',0,1,5);
+    shader.loadShader('Colour','shaders/ColourVertex.glsl','shaders/ColourFragment.glsl',ErrorExit.OFF)
+    shader.use('Colour')
 
-
-    self.view=lookAt(Vec3(0,1,5),Vec3.zero(),Vec3.up())
+    self.view=lookAt(Vec3(0,1,2),Vec3.zero(),Vec3.up())
     self.project=perspective( 45.0, float(self.width)/float(self.height), 0.05, 350.0 )
     self.buildVAO()
 
 
   def buildVAO(self) :
-    verts=VectorVec3([
-    Vec3(0.0,1.0,1.0),
-    Vec3(0.0,0.0,-1.0),
-    Vec3(-0.5,0.0,1.0),
-    Vec3(0.0,1.0,1.0),
-    Vec3(0.0,0.0,-1.0),
-    Vec3(0.5,0.0,1.0),
-    Vec3(0.0,1.0,1.0),
-    Vec3(0.0,0.0,1.5),
-    Vec3(-0.5,0.0,1.0),
-    Vec3(0.0,1.0,1.0),
-    Vec3(0.0,0.0,1.5),
-    Vec3(0.5,0.0,1.0)])
-    
-    normals=VectorVec3()
-    n=calcNormal(verts[2],verts[1],verts[0]);
-    normals.extend([n,n,n])
-    n=calcNormal(verts[3],verts[4],verts[5]);
-    normals.extend([n,n,n])
-    n=calcNormal(verts[6],verts[7],verts[8]);
-    normals.extend([n,n,n])
-    n=calcNormal(verts[11],verts[10],verts[9]);
-    normals.extend([n,n,n])
+    vertAndColour=VectorVec3([
+        Vec3(-0.26286500, 0.0000000, 0.42532500), Vec3(1.0,0.0,0.0),
+        Vec3(0.26286500, 0.0000000, 0.42532500), Vec3(1.0,0.55,0.0),
+        Vec3(-0.26286500, 0.0000000, -0.42532500),  Vec3(1.0,0.0,1.0),
+        Vec3(0.26286500, 0.0000000, -0.42532500),  Vec3(0.0,1.0,0.0),
+        Vec3(0.0000000, 0.42532500, 0.26286500),  Vec3(0.0,0.0,1.0),
+        Vec3(0.0000000, 0.42532500, -0.26286500),  Vec3(0.29,0.51,0.0),
+        Vec3(0.0000000, -0.42532500, 0.26286500),  Vec3(0.5,0.0,0.5),
+        Vec3(0.0000000, -0.42532500, -0.26286500),  Vec3(1.0,1.0,1.0),
+        Vec3(0.42532500, 0.26286500, 0.0000000),  Vec3(0.0,1.0,1.0),
+        Vec3(-0.42532500, 0.26286500, 0.0000000),  Vec3(0.0,0.0,0.0),
+        Vec3(0.42532500, -0.26286500, 0.0000000),  Vec3(0.12,0.56,1.0),
+        Vec3(-0.42532500, -0.26286500, 0.0000000),  Vec3(0.86,0.08,0.24)
+    ])
 
-    self.vao=VAOFactory.createVAO(multiBufferVAO,GL_TRIANGLES)
+    indices=VectorUShort([0,6,1,0,11,6,1,4,0,1,8,4,1,10,8,2,5,3,
+    2,9,5,2,11,9,3,7,2,3,10,7,4,8,5,4,9,0,
+    5,8,3,5,9,4,6,10,1,6,11,7,7,10,6,7,11,2,
+    8,10,3,9,11,0])
+
+    self.vao=VAOFactory.createVAO(simpleIndexVAO,GL_TRIANGLES)
     self.vao.bind()
-    self.vao.setData(len(verts)*Vec3.sizeof(),verts)
-    self.vao.setVertexAttributePointer(0,3,GL_FLOAT,0,0)
-    self.vao.setData(len(normals)*Vec3.sizeof(),normals)
-    self.vao.setVertexAttributePointer(1,3,GL_FLOAT,0,0)
-    self.vao.setNumIndices(len(verts)) 
+    self.vao.setData(len(vertAndColour)*Vec3.sizeof(),vertAndColour,len(indices),indices)
+    self.vao.setVertexAttributePointer(0,3,GL_FLOAT,24,0)
+    self.vao.setVertexAttributePointer(1,3,GL_FLOAT,24,3)
+
+
+    self.vao.setNumIndices(len(indices)) 
     self.vao.unbind() 
 
 
   def loadMatricesToShader(self) :
     shader = ShaderLib.instance()  
-    shader.use('Phong')
-    MV=  self.view*self.mouseGlobalTX
-    MVP= self.project*MV;
-    normalMatrix=Mat3(MV)
-    normalMatrix.inverse().transpose()
-    shader.setUniform("MV",MV)
-    shader.setUniform("MVP",MVP)
-    shader.setUniform("normalMatrix",normalMatrix)
-    shader.setUniform("M",self.mouseGlobalTX)
+    shader.use('Colour')
+  
+    shader.setUniform("MVP",self.project*self.view*self.mouseGlobalTX)
   
   def paintGL(self):
     try :
