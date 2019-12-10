@@ -1,16 +1,18 @@
 #!/usr/bin/env python
 from __future__ import print_function
-from PyQt5.QtGui import QOpenGLWindow,QSurfaceFormat
-from PyQt5.QtWidgets import QApplication
-from  PyQt5.QtCore import *
+from PySide2.QtGui import QOpenGLWindow,QSurfaceFormat
+from PySide2.QtWidgets import QApplication
+from PySide2.QtCore import *
 import sys
 from pyngl import *
 from OpenGL.GL import *
+
 
 class MainWindow(QOpenGLWindow) :
   
   def __init__(self, parent=None):
     QOpenGLWindow.__init__(self)
+    #super(QOpenGLWindow, self).__init__(parent)
     self.mouseGlobalTX=Mat4()
     self.width=int(1024)
     self.height=int(720)
