@@ -178,7 +178,7 @@ void NGLScene::initializeGL()
 	// build our VertexArrayObject
 	buildVAOSphere();
 	// load and set a texture
-	ngl::Texture t("textures/earth.png");
+	ngl::Texture t("textures/earth.tiff");
 	t.setTextureGL();
 
 }
