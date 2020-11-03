@@ -143,7 +143,7 @@ void NGLScene::initializeGL()
   // we need to initialise the NGL lib which will load all of the OpenGL functions, this must
   // be done once we have a valid GL context but before we call any GL commands. If we dont do
   // this everything will crash
-  ngl::NGLInit::instance();
+  ngl::NGLInit::initialize();
   glClearColor(0.4f, 0.4f, 0.4f, 1.0f);			   // Grey Background
   // enable depth testing for drawing
   glEnable(GL_DEPTH_TEST);
@@ -159,26 +159,22 @@ void NGLScene::initializeGL()
 	// set the shape using FOV 45 Aspect Ratio based on Width and Height
 	// The final two are near and far clipping planes of 0.5 and 10
   m_project=ngl::perspective(45,(float)720.0/576.0,0.001,150);
-	// now to load the shader and set the values
-	// grab an instance of shader manager
-	ngl::ShaderLib *shader=ngl::ShaderLib::instance();
-	// load a frag and vert shaders
 
-	shader->createShaderProgram("TextureShader");
+	ngl::ShaderLib::createShaderProgram("TextureShader");
 
-	shader->attachShader("SimpleVertex",ngl::ShaderType::VERTEX);
-	shader->attachShader("SimpleFragment",ngl::ShaderType::FRAGMENT);
-	shader->loadShaderSource("SimpleVertex","shaders/TextureVertex.glsl");
-	shader->loadShaderSource("SimpleFragment","shaders/TextureFragment.glsl");
+	ngl::ShaderLib::attachShader("SimpleVertex",ngl::ShaderType::VERTEX);
+	ngl::ShaderLib::attachShader("SimpleFragment",ngl::ShaderType::FRAGMENT);
+	ngl::ShaderLib::loadShaderSource("SimpleVertex","shaders/TextureVertex.glsl");
+	ngl::ShaderLib::loadShaderSource("SimpleFragment","shaders/TextureFragment.glsl");
 
-	shader->compileShader("SimpleVertex");
-	shader->compileShader("SimpleFragment");
-	shader->attachShaderToProgram("TextureShader","SimpleVertex");
-	shader->attachShaderToProgram("TextureShader","SimpleFragment");
+	ngl::ShaderLib::compileShader("SimpleVertex");
+	ngl::ShaderLib::compileShader("SimpleFragment");
+	ngl::ShaderLib::attachShaderToProgram("TextureShader","SimpleVertex");
+	ngl::ShaderLib::attachShaderToProgram("TextureShader","SimpleFragment");
 
 
-	shader->linkProgramObject("TextureShader");
-	(*shader)["TextureShader"]->use();
+	ngl::ShaderLib::linkProgramObject("TextureShader");
+	ngl::ShaderLib::use("TextureShader");
 	// build our VertexArrayObject
 	buildVAOSphere();
 	// load and set a texture
@@ -210,12 +206,11 @@ void NGLScene::paintGL()
   m_mouseGlobalTX.m_m[3][2] = m_modelPos.m_z;
 
 
-	ngl::ShaderLib *shader=ngl::ShaderLib::instance();
-	(*shader)["TextureShader"]->use();
+	ngl::ShaderLib::use("TextureShader");
 	ngl::Mat4 MVP;
   MVP=m_project*m_view*m_mouseGlobalTX;
 
-	shader->setUniform("MVP",MVP);
+	ngl::ShaderLib::setUniform("MVP",MVP);
 
 	// now we bind back our vertex array object and draw
   m_vao->bind();

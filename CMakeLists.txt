@@ -1,9 +1,11 @@
-cmake_minimum_required(VERSION 2.8.11)
-# Name of the project
-set(PROJECT_NAME VertexArrayObjects	)
-project(${PROJECT_NAME})
+cmake_minimum_required(VERSION 3.12)
+project(VertexArrayObjectsBuildALL)
 
 add_subdirectory(${PROJECT_SOURCE_DIR}/Boid/ )
 add_subdirectory(${PROJECT_SOURCE_DIR}/BoidShaded/ )
+add_subdirectory(${PROJECT_SOURCE_DIR}/ChangingVAO/ )
+add_subdirectory(${PROJECT_SOURCE_DIR}/ExtendedVAOFactory/ )
+add_subdirectory(${PROJECT_SOURCE_DIR}/MultiBufferVAOFactory/ )
 add_subdirectory(${PROJECT_SOURCE_DIR}/SimpleCube/ )
+add_subdirectory(${PROJECT_SOURCE_DIR}/SimpleIndexVAOFactory/ )
 add_subdirectory(${PROJECT_SOURCE_DIR}/VAOSphere/ )

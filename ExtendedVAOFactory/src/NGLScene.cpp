@@ -36,7 +36,7 @@ void NGLScene::initializeGL()
   // we need to initialise the NGL lib which will load all of the OpenGL functions, this must
   // be done once we have a valid GL context but before we call any GL commands. If we dont do
   // this everything will crash
-  ngl::NGLInit::instance();
+  ngl::NGLInit::initialize();
 
   glClearColor(0.4f, 0.4f, 0.4f, 1.0f);			   // Grey Background
   // enable depth testing for drawing
@@ -55,32 +55,29 @@ void NGLScene::initializeGL()
   // The final two are near and far clipping planes of 0.5 and 10
   m_project=ngl::perspective(45.0f,1024.0f/720.0f,0.001f,150.0f);
 
-  // now to load the shader and set the values
-  // grab an instance of shader manager
-  ngl::ShaderLib *shader=ngl::ShaderLib::instance();
   // load a frag and vert shaders
   constexpr auto shaderProgram="Colour";
   constexpr auto vertexShader="ColourVertex";
   constexpr auto fragmentShader="ColourFragment";
   // we are creating a shader called Colour
-  shader->createShaderProgram(shaderProgram);
+  ngl::ShaderLib::createShaderProgram(shaderProgram);
   // now we are going to create empty shaders for Frag and Vert
-  shader->attachShader(vertexShader,ngl::ShaderType::VERTEX);
-  shader->attachShader(fragmentShader,ngl::ShaderType::FRAGMENT);
+  ngl::ShaderLib::attachShader(vertexShader,ngl::ShaderType::VERTEX);
+  ngl::ShaderLib::attachShader(fragmentShader,ngl::ShaderType::FRAGMENT);
   // attach the source
-  shader->loadShaderSource(vertexShader,"shaders/ColourVertex.glsl");
-  shader->loadShaderSource(fragmentShader,"shaders/ColourFragment.glsl");
+  ngl::ShaderLib::loadShaderSource(vertexShader,"shaders/ColourVertex.glsl");
+  ngl::ShaderLib::loadShaderSource(fragmentShader,"shaders/ColourFragment.glsl");
   // compile the shaders
-  shader->compileShader(vertexShader);
-  shader->compileShader(fragmentShader);
+  ngl::ShaderLib::compileShader(vertexShader);
+  ngl::ShaderLib::compileShader(fragmentShader);
   // add them to the program
-  shader->attachShaderToProgram(shaderProgram,vertexShader);
-  shader->attachShaderToProgram(shaderProgram,fragmentShader);
+  ngl::ShaderLib::attachShaderToProgram(shaderProgram,vertexShader);
+  ngl::ShaderLib::attachShaderToProgram(shaderProgram,fragmentShader);
 
   // now we have associated this data we can link the shader
-  shader->linkProgramObject(shaderProgram);
+  ngl::ShaderLib::linkProgramObject(shaderProgram);
   // and make it active ready to load values
-  (*shader)[shaderProgram]->use();
+  ngl::ShaderLib::use(shaderProgram);
   // register our new Factory to draw the VAO
   ngl::VAOFactory::registerVAOCreator("multiBufferIndexVAO", MultiBufferIndexVAO::create);
   ngl::VAOFactory::listCreators();
@@ -183,22 +180,21 @@ void NGLScene::paintGL()
   m_mouseGlobalTX.m_m[3][1] = m_modelPos.m_y;
   m_mouseGlobalTX.m_m[3][2] = m_modelPos.m_z;
 
-  ngl::ShaderLib *shader=ngl::ShaderLib::instance();
-  (*shader)["Colour"]->use();
+  ngl::ShaderLib::use("Colour");
   m_vao->bind();
 
   ngl::Transformation t;
 
   t.setPosition(-1.2f,0.0f,0.0f);
   ngl::Mat4 MVP= m_project*m_view*t.getMatrix()*m_mouseGlobalTX;
-  shader->setUniform("MVP",MVP);
+  ngl::ShaderLib::setUniform("MVP",MVP);
 
   m_vao->draw(0,m_index*3);
 
   t.setPosition(0.0f,0.0f,0.0f);
 
    MVP= m_project*m_view*t.getMatrix()*m_mouseGlobalTX;
-  shader->setUniform("MVP",MVP);
+  ngl::ShaderLib::setUniform("MVP",MVP);
 
   glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
   // draw right one
@@ -206,7 +202,7 @@ void NGLScene::paintGL()
 
   t.setPosition(1.2f,0.0f,0.0f);
   MVP= m_project*m_view*t.getMatrix()*m_mouseGlobalTX;
-  shader->setUniform("MVP",MVP);
+  ngl::ShaderLib::setUniform("MVP",MVP);
 
   m_vao->draw(m_index,3);
   glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);

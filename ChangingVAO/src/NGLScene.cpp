@@ -8,7 +8,7 @@
 #include <ngl/VAOPrimitives.h>
 #include <ngl/Random.h>
 #include <ngl/ShaderLib.h>
-
+#include <memory> 
 
 
 NGLScene::NGLScene()
@@ -28,6 +28,8 @@ void NGLScene::resizeGL( int _w, int _h )
   m_project=ngl::perspective( 45.0f, static_cast<float>( _w ) / _h, 0.05f, 350.0f );
   m_win.width  = static_cast<int>( _w * devicePixelRatio() );
   m_win.height = static_cast<int>( _h * devicePixelRatio() );
+  m_text->setScreenSize(width(),height());
+
 }
 
 void NGLScene::initializeGL()
@@ -35,7 +37,7 @@ void NGLScene::initializeGL()
   // we need to initialise the NGL lib which will load all of the OpenGL functions, this must
   // be done once we have a valid GL context but before we call any GL commands. If we dont do
   // this everything will crash
-  ngl::NGLInit::instance();
+  ngl::NGLInit::initialize();
 
 	glClearColor(0.4f, 0.4f, 0.4f, 1.0f);			   // Grey Background
 	// enable depth testing for drawing
@@ -56,13 +58,12 @@ void NGLScene::initializeGL()
 
 // now to load the shader and set the values
 	// grab an instance of shader manager
-	ngl::ShaderLib *shader=ngl::ShaderLib::instance();
-	shader->use("nglColourShader");
-  shader->setUniform("Colour",1.0f,1.0f,1.0f,1.0f);
+	ngl::ShaderLib::use("nglColourShader");
+  ngl::ShaderLib::setUniform("Colour",1.0f,1.0f,1.0f,1.0f);
 	glViewport(0,0,width(),height());
 	startTimer(250);
 	glPointSize(10);
-	m_text.reset(new  ngl::Text(QFont("Arial",18)));
+	m_text=std::make_unique<ngl::Text>("fonts/Arial.ttf",18);
 	m_text->setScreenSize(width(),height());
 	// create the VAO but don't populate
   m_vao=ngl::VAOFactory::createVAO(ngl::simpleVAO,GL_LINES);
@@ -90,13 +91,12 @@ void NGLScene::paintGL()
   m_mouseGlobalTX.m_m[3][0] = m_modelPos.m_x;
   m_mouseGlobalTX.m_m[3][1] = m_modelPos.m_y;
   m_mouseGlobalTX.m_m[3][2] = m_modelPos.m_z;
-  ngl::ShaderLib *shader=ngl::ShaderLib::instance();
-  (*shader)["nglColourShader"]->use();
+  ngl::ShaderLib::use("nglColourShader");
 
   ngl::Mat4 MVP;
   MVP=m_project*m_view*m_mouseGlobalTX;
 
-  shader->setUniform("MVP",MVP);
+  ngl::ShaderLib::setUniform("MVP",MVP);
   m_vao->bind();
   m_vao->setData( ngl::SimpleVAO::VertexData(m_data.size()*sizeof(ngl::Vec3),m_data[0].m_x));
   // We must do this each time as we change the data.
@@ -106,8 +106,8 @@ void NGLScene::paintGL()
   m_vao->unbind();
 
   m_text->setColour(1.0f,1.0f,1.0f);
-  QString text=QString("Data Size %1 ").arg(m_data.size());
-  m_text->renderText(10,18,text );
+  std::string text=fmt::format("Data Size {} ",m_data.size());
+  m_text->renderText(10,700,text );
 
 }
 
@@ -116,13 +116,11 @@ void NGLScene::timerEvent(QTimerEvent *_event)
 {
   NGL_UNUSED(_event);
   // clear out old data ready to add new
-  //m_data.clear();
-  ngl::Random *rng = ngl::Random::instance();
   //m_data.resize(2*static_cast<size_t>(rng->randomPositiveNumber(3500)));
   // note reference as mutating vector
   for(auto &p : m_data)
   {
-    p=rng->getRandomVec3()*5;
+    p=ngl::Random::getRandomVec3()*5;
   }
 
   update();

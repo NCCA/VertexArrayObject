@@ -35,7 +35,7 @@ void NGLScene::initializeGL()
   // we need to initialise the NGL lib which will load all of the OpenGL functions, this must
   // be done once we have a valid GL context but before we call any GL commands. If we dont do
   // this everything will crash
-  ngl::NGLInit::instance();
+  ngl::NGLInit::initialize();
 
 	glClearColor(0.4f, 0.4f, 0.4f, 1.0f);			   // Grey Background
 	// enable depth testing for drawing
@@ -56,9 +56,8 @@ void NGLScene::initializeGL()
 
 // now to load the shader and set the values
 	// grab an instance of shader manager
-	ngl::ShaderLib *shader=ngl::ShaderLib::instance();
-	shader->use("nglColourShader");
-  shader->setUniform("Colour",1.0f,1.0f,1.0f,1.0f);
+	ngl::ShaderLib::use("nglColourShader");
+  ngl::ShaderLib::setUniform("Colour",1.0f,1.0f,1.0f,1.0f);
 	buildVAO();
 	glViewport(0,0,width(),height());
 }
@@ -121,17 +120,16 @@ void NGLScene::paintGL()
   m_mouseGlobalTX.m_m[3][0] = m_modelPos.m_x;
   m_mouseGlobalTX.m_m[3][1] = m_modelPos.m_y;
   m_mouseGlobalTX.m_m[3][2] = m_modelPos.m_z;
-  ngl::ShaderLib *shader=ngl::ShaderLib::instance();
-  (*shader)["nglColourShader"]->use();
+  ngl::ShaderLib::use("nglColourShader");
 
   ngl::Mat4 MVP;
   MVP=m_project*m_view*m_mouseGlobalTX;
 
-  shader->setUniform("MVP",MVP);
+  ngl::ShaderLib::setUniform("MVP",MVP);
 
 
   m_vao->bind();
-  shader->setUniform("MVP",MVP);
+  ngl::ShaderLib::setUniform("MVP",MVP);
   m_vao->draw();
   m_vao->unbind();
 }
