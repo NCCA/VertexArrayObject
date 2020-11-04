@@ -116,13 +116,11 @@ void NGLScene::timerEvent(QTimerEvent *_event)
 {
   NGL_UNUSED(_event);
   // clear out old data ready to add new
-  //m_data.resize(2*static_cast<size_t>(rng->randomPositiveNumber(3500)));
   // note reference as mutating vector
   for(auto &p : m_data)
   {
     p=ngl::Random::getRandomVec3()*5;
   }
-
   update();
 }
 
