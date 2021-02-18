@@ -1,6 +1,5 @@
 #include <QMouseEvent>
 #include <QGuiApplication>
-
 #include "NGLScene.h"
 #include <ngl/Transformation.h>
 #include <ngl/NGLInit.h>
@@ -80,7 +79,6 @@ void NGLScene::buildVAO()
     ngl::Vec3(0.0f,0.0f,1.5f),
     ngl::Vec3(0.5f,0.0f,1.0f)
   }};
-  std::cout<<"sizeof(verts) "<<sizeof(verts)<<" sizeof(ngl::Vec3) "<<sizeof(ngl::Vec3)<<"\n";
   std::cout<<"sizeof(verts) "<<sizeof(verts)<<" sizeof(ngl::Vec3) "<<sizeof(ngl::Vec3)<<"\n";
   // create a vao as a series of GL_TRIANGLES
   m_vao=ngl::VAOFactory::createVAO(ngl::simpleVAO,GL_TRIANGLES);
