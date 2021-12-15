@@ -10,9 +10,9 @@ if(NOT DEFINED CMAKE_TOOLCHAIN_FILE AND DEFINED ENV{CMAKE_TOOLCHAIN_FILE})
 endif()
 
 # Name of the project
-project(ChangingVAOBuild)
+project(ChangingVAOBuildMultiBuffer)
 # This is the name of the Exe change this and it will change everywhere
-set(TargetName ChangingVAO)
+set(TargetName ChangingVAOMultiBuffer)
 # This will include the file NGLConfig.cmake, you need to add the location to this either using
 # -DCMAKE_PREFIX_PATH=~/NGL or as a system environment variable. 
 find_package(NGL CONFIG REQUIRED)
@@ -42,4 +42,10 @@ add_custom_target(${TargetName}CopyFonts ALL
     COMMAND ${CMAKE_COMMAND} -E copy_directory
     ${CMAKE_CURRENT_SOURCE_DIR}/fonts
     $<TARGET_FILE_DIR:${TargetName}>/fonts
+) 
+
+add_custom_target(${TargetName}CopyShaders ALL
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${CMAKE_CURRENT_SOURCE_DIR}/shaders
+    $<TARGET_FILE_DIR:${TargetName}>/shaders
 ) 
