@@ -8,6 +8,7 @@
 #include <ngl/Random.h>
 #include <ngl/ShaderLib.h>
 #include <memory>
+#include <iostream>
 
 constexpr size_t c_dataSize = 123456;
 

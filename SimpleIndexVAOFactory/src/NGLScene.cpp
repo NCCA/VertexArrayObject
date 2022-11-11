@@ -8,6 +8,7 @@
 #include <ngl/VAOFactory.h>
 #include <ngl/SimpleIndexVAO.h>
 #include <array>
+#include <iostream>
 
 NGLScene::NGLScene()
 {

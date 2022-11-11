@@ -8,6 +8,7 @@
 #include <ngl/ShaderLib.h>
 #include <ngl/VAOFactory.h>
 #include <ngl/MultiBufferVAO.h>
+#include <iostream>
 
 NGLScene::NGLScene()
 {

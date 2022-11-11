@@ -9,6 +9,7 @@
 #include <ngl/VAOFactory.h>
 #include "MultiBufferIndexVAO.h"
 #include <array>
+#include <iostream>
 
 NGLScene::NGLScene()
 {

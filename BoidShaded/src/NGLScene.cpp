@@ -9,6 +9,7 @@
 #include <ngl/ShaderLib.h>
 #include <ngl/NGLStream.h>
 #include <array>
+#include <iostream>
 
 NGLScene::NGLScene()
 {

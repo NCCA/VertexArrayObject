@@ -9,6 +9,7 @@
 #include <ngl/VAOFactory.h>
 #include <ngl/SimpleVAO.h>
 //#include  <cstddef>
+#include <iostream>
 
 NGLScene::NGLScene()
 {

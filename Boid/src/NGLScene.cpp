@@ -6,6 +6,7 @@
 #include <ngl/VAOFactory.h>
 #include <ngl/SimpleVAO.h>
 #include <ngl/ShaderLib.h>
+#include <iostream>
 
 NGLScene::NGLScene()
 {
