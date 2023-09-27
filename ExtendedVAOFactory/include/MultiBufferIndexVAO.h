@@ -17,8 +17,8 @@ class  MultiBufferIndexVAO : public ngl::AbstractVAO
     //----------------------------------------------------------------------------------------------------------------------
     /// @brief draw the VAO using glDrawArrays
     //----------------------------------------------------------------------------------------------------------------------
-    virtual void draw() const;
-    virtual void draw(int _startIndex, int _amount) const;
+    virtual void draw() const override;
+    void draw(int _startIndex, int _amount) const ;
     //----------------------------------------------------------------------------------------------------------------------
     /// @brief dtor don't do anything as the remove clears things
     //----------------------------------------------------------------------------------------------------------------------
@@ -26,7 +26,7 @@ class  MultiBufferIndexVAO : public ngl::AbstractVAO
     //----------------------------------------------------------------------------------------------------------------------
     /// @brief remove the VAO and buffers created
     //----------------------------------------------------------------------------------------------------------------------
-    virtual void removeVAO();
+    virtual void removeVAO() override;
     //----------------------------------------------------------------------------------------------------------------------
     /// @brief, this method sets the data for the VAO if data has already been set it will remove the existing data
     /// and then re-set with the new data.
@@ -38,7 +38,7 @@ class  MultiBufferIndexVAO : public ngl::AbstractVAO
     /// @param _indexType the type of the values in the indices buffer. Must be one of GL_UNSIGNED_BYTE, GL_UNSIGNED_SHORT, or GL_UNSIGNED_INT.
     /// @param _mode the draw mode hint used by GL
     //----------------------------------------------------------------------------------------------------------------------
-    virtual void setData(const VertexData &_data);
+    virtual void setData(const VertexData &_data) override;
     void setIndices(unsigned int _indexSize,const GLvoid *_indexData,GLenum _indexType,GLenum _mode=GL_STATIC_DRAW);
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -46,10 +46,10 @@ class  MultiBufferIndexVAO : public ngl::AbstractVAO
     /// if we have the more than one buffer the sub class manages the id's
     /// @param _buffer index (default to 0 for single buffer VAO's)
     //----------------------------------------------------------------------------------------------------------------------
-     GLuint getBufferID(unsigned int ){return m_buffer;}
+     GLuint getBufferID(unsigned int )const override{return m_buffer;}
      // no need to implement this for the demo but if you need to
      // modify the buffer do so
-     ngl::Real * mapBuffer(unsigned int , GLenum ){ return nullptr;}
+     ngl::Real * mapBuffer(unsigned int , GLenum ) override{ return nullptr;}
 
 
   protected :
